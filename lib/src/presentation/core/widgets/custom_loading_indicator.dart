@@ -1,0 +1,15 @@
+import 'package:material_ui/material_ui.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+import '../theme/theme.dart';
+
+class CustomLoadingIndicator extends StatelessWidget {
+  const CustomLoadingIndicator({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SpinKitThreeBounce(color: context.color.text.tertiary, size: 16),
+    );
+  }
+}
