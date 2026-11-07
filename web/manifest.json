@@ -1,6 +1,6 @@
 {
-    "name": "start_vms",
-    "short_name": "start_vms",
+    "name": "stark_vms",
+    "short_name": "stark_vms",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
