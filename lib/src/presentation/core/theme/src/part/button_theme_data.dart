@@ -7,11 +7,11 @@ class _FilledButtonLightThemeData with ThemeExtensions {
   FilledButtonThemeData call() {
     return FilledButtonThemeData(
       style: ButtonStyle(
-        shape: (WidgetStatePropertyAll<RoundedRectangleBorder>(
+        shape: WidgetStateProperty.all(
           RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(const Dimensions().radius.md),
+            borderRadius: BorderRadius.circular(const Dimensions().radius.sm),
           ),
-        )),
+        ),
         padding: WidgetStateProperty.all(
           EdgeInsets.symmetric(horizontal: dimensions.spacing.xl),
         ),
@@ -32,11 +32,8 @@ class _FilledButtonDarkThemeData with ThemeExtensions {
     return FilledButtonThemeData(
       style: ButtonStyle(
         shape: WidgetStateProperty.all(
-          StadiumBorder(
-            side: BorderSide(
-              color: darkColor.primary,
-              width: dimensions.spacing.xxs,
-            ),
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(const Dimensions().radius.sm),
           ),
         ),
         padding: WidgetStateProperty.all(
@@ -63,11 +60,7 @@ class _ElevatedButtonLightThemeData with ThemeExtensions {
         elevation: WidgetStateProperty.all(0),
         shape: WidgetStateProperty.all(
           RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(const Dimensions().radius.md),
-            side: BorderSide(
-              color: lightColor.primary,
-              width: dimensions.spacing.xxs,
-            ),
+            borderRadius: BorderRadius.circular(const Dimensions().radius.sm),
           ),
         ),
         padding: WidgetStateProperty.all(
@@ -91,11 +84,8 @@ class _ElevatedButtonDarkThemeData with ThemeExtensions {
       style: ButtonStyle(
         elevation: WidgetStateProperty.all(0),
         shape: WidgetStateProperty.all(
-          StadiumBorder(
-            side: BorderSide(
-              color: darkColor.primary,
-              width: dimensions.spacing.xxs,
-            ),
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(const Dimensions().radius.sm),
           ),
         ),
         padding: WidgetStateProperty.all(

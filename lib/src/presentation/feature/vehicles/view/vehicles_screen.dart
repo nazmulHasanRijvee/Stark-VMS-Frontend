@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
@@ -481,279 +483,303 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
   }
 
   Widget _buildDesktopTable(BuildContext context, List<Vehicle> vehicles) {
-    return Table(
-      columnWidths: const {
-        0: FlexColumnWidth(1.8), // Vehicle Number
-        1: FlexColumnWidth(1.4), // Company
-        2: FlexColumnWidth(1.0), // Type
-        3: FlexColumnWidth(1.0), // Brand
-        4: FlexColumnWidth(1.0), // Model
-        5: FlexColumnWidth(1.0), // Status
-        6: FlexColumnWidth(1.4), // Actions
-      },
-      children: [
-        TableRow(
-          decoration: BoxDecoration(
-            color: context.color.surfaceSubtle,
-            border: Border(bottom: BorderSide(color: context.color.border)),
-          ),
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.spacing.lg,
-                vertical: context.spacing.md,
-              ),
-              child: Text(
-                context.loc.colVehicleNumber.toUpperCase(),
-                style: context.textStyle.labelSmall.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: context.color.text.secondary,
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.spacing.lg,
-                vertical: context.spacing.md,
-              ),
-              child: Text(
-                context.loc.colCompany.toUpperCase(),
-                style: context.textStyle.labelSmall.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: context.color.text.secondary,
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.spacing.lg,
-                vertical: context.spacing.md,
-              ),
-              child: Text(
-                context.loc.colType.toUpperCase(),
-                style: context.textStyle.labelSmall.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: context.color.text.secondary,
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.spacing.lg,
-                vertical: context.spacing.md,
-              ),
-              child: Text(
-                context.loc.colBrand.toUpperCase(),
-                style: context.textStyle.labelSmall.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: context.color.text.secondary,
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.spacing.lg,
-                vertical: context.spacing.md,
-              ),
-              child: Text(
-                context.loc.colModel.toUpperCase(),
-                style: context.textStyle.labelSmall.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: context.color.text.secondary,
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.spacing.lg,
-                vertical: context.spacing.md,
-              ),
-              child: Text(
-                context.loc.colStatus.toUpperCase(),
-                style: context.textStyle.labelSmall.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: context.color.text.secondary,
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.spacing.lg,
-                vertical: context.spacing.md,
-              ),
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  context.loc.colActions.toUpperCase(),
-                  style: context.textStyle.labelSmall.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: context.color.text.secondary,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const minTableWidth = 920.0;
+        final tableWidth = math.max(constraints.maxWidth, minTableWidth);
+
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: SizedBox(
+            width: tableWidth,
+            child: Table(
+              columnWidths: const {
+                0: FlexColumnWidth(1.8), // Vehicle Number
+                1: FlexColumnWidth(1.4), // Company
+                2: FlexColumnWidth(1.1), // Type
+                3: FlexColumnWidth(1.0), // Brand
+                4: FlexColumnWidth(1.0), // Model
+                5: FlexColumnWidth(1.1), // Status
+                6: FlexColumnWidth(1.6), // Actions
+              },
+              children: [
+                TableRow(
+                  decoration: BoxDecoration(
+                    color: context.color.surfaceSubtle,
+                    border: Border(bottom: BorderSide(color: context.color.border)),
                   ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        for (final v in vehicles)
-          TableRow(
-            decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: context.color.border)),
-            ),
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.spacing.lg,
-                  vertical: context.spacing.md2,
-                ),
-                child: Text(
-                  v.vehicleNumber,
-                  style: context.textStyle.bodyMedium.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: context.color.text.primary,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.spacing.lg,
-                  vertical: context.spacing.md2,
-                ),
-                child: Text(
-                  v.company,
-                  style: context.textStyle.dataMedium.copyWith(
-                    color: context.color.text.primary,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.spacing.lg,
-                  vertical: context.spacing.md2,
-                ),
-                child: Text(
-                  v.type,
-                  style: context.textStyle.dataMedium.copyWith(
-                    color: context.color.text.secondary,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.spacing.lg,
-                  vertical: context.spacing.md2,
-                ),
-                child: Text(
-                  v.brand,
-                  style: context.textStyle.dataMedium.copyWith(
-                    color: context.color.text.primary,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.spacing.lg,
-                  vertical: context.spacing.md2,
-                ),
-                child: Text(
-                  v.model,
-                  style: context.textStyle.dataMedium.copyWith(
-                    color: context.color.text.secondary,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.spacing.lg,
-                  vertical: context.spacing.md,
-                ),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: StatusChip(status: v.status),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.spacing.lg,
-                  vertical: context.spacing.sm3,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    InkWell(
-                      onTap: () => _openVehicleEditor(v),
-                      borderRadius: BorderRadius.circular(context.radius.xs2),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.spacing.sm,
-                          vertical: context.spacing.xs,
-                        ),
-                        decoration: BoxDecoration(
-                          color: context.color.surfaceSubtle,
-                          borderRadius: BorderRadius.circular(
-                            context.radius.xs2,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.edit_outlined,
-                              size: context.sizes.iconXs,
-                              color: context.color.primary,
-                            ),
-                            SizedBox(width: context.spacing.xs),
-                            Text(
-                              context.loc.edit,
-                              style: context.textStyle.labelSmall.copyWith(
-                                color: context.color.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.spacing.md,
+                        vertical: context.spacing.md,
+                      ),
+                      child: Text(
+                        context.loc.colVehicleNumber.toUpperCase(),
+                        style: context.textStyle.labelSmall.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: context.color.text.secondary,
                         ),
                       ),
                     ),
-                    SizedBox(width: context.spacing.sm2),
-                    InkWell(
-                      onTap: () => _handleDelete(v),
-                      borderRadius: BorderRadius.circular(context.radius.xs2),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.spacing.sm,
-                          vertical: context.spacing.xs,
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.spacing.md,
+                        vertical: context.spacing.md,
+                      ),
+                      child: Text(
+                        context.loc.colCompany.toUpperCase(),
+                        style: context.textStyle.labelSmall.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: context.color.text.secondary,
                         ),
-                        decoration: BoxDecoration(
-                          color: context.color.errorBg,
-                          borderRadius: BorderRadius.circular(
-                            context.radius.xs2,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.spacing.md,
+                        vertical: context.spacing.md,
+                      ),
+                      child: Text(
+                        context.loc.colType.toUpperCase(),
+                        style: context.textStyle.labelSmall.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: context.color.text.secondary,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.spacing.md,
+                        vertical: context.spacing.md,
+                      ),
+                      child: Text(
+                        context.loc.colBrand.toUpperCase(),
+                        style: context.textStyle.labelSmall.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: context.color.text.secondary,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.spacing.md,
+                        vertical: context.spacing.md,
+                      ),
+                      child: Text(
+                        context.loc.colModel.toUpperCase(),
+                        style: context.textStyle.labelSmall.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: context.color.text.secondary,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.spacing.md,
+                        vertical: context.spacing.md,
+                      ),
+                      child: Text(
+                        context.loc.colStatus.toUpperCase(),
+                        style: context.textStyle.labelSmall.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: context.color.text.secondary,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.spacing.md,
+                        vertical: context.spacing.md,
+                      ),
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          context.loc.colActions.toUpperCase(),
+                          style: context.textStyle.labelSmall.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: context.color.text.secondary,
                           ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.delete_outline,
-                              size: context.sizes.iconXs,
-                              color: context.color.error,
-                            ),
-                            SizedBox(width: context.spacing.xs),
-                            Text(
-                              context.loc.delete,
-                              style: context.textStyle.labelSmall.copyWith(
-                                color: context.color.error,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
                         ),
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
+                for (final v in vehicles)
+                  TableRow(
+                    decoration: BoxDecoration(
+                      border: Border(bottom: BorderSide(color: context.color.border)),
+                    ),
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.spacing.md,
+                          vertical: context.spacing.md2,
+                        ),
+                        child: Text(
+                          v.vehicleNumber,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: context.textStyle.bodyMedium.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: context.color.text.primary,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.spacing.md,
+                          vertical: context.spacing.md2,
+                        ),
+                        child: Text(
+                          v.company,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: context.textStyle.dataMedium.copyWith(
+                            color: context.color.text.primary,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.spacing.md,
+                          vertical: context.spacing.md2,
+                        ),
+                        child: Text(
+                          v.type,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: context.textStyle.dataMedium.copyWith(
+                            color: context.color.text.secondary,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.spacing.md,
+                          vertical: context.spacing.md2,
+                        ),
+                        child: Text(
+                          v.brand,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: context.textStyle.dataMedium.copyWith(
+                            color: context.color.text.primary,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.spacing.md,
+                          vertical: context.spacing.md2,
+                        ),
+                        child: Text(
+                          v.model,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: context.textStyle.dataMedium.copyWith(
+                            color: context.color.text.secondary,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.spacing.md,
+                          vertical: context.spacing.md,
+                        ),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: StatusChip(status: v.status),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.spacing.md,
+                          vertical: context.spacing.sm3,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            InkWell(
+                              onTap: () => _openVehicleEditor(v),
+                              borderRadius: BorderRadius.circular(context.radius.xs2),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: context.spacing.sm2,
+                                  vertical: context.spacing.xs,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: context.color.surfaceSubtle,
+                                  borderRadius: BorderRadius.circular(
+                                    context.radius.xs2,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.edit_outlined,
+                                      size: context.sizes.iconXs,
+                                      color: context.color.primary,
+                                    ),
+                                    SizedBox(width: context.spacing.xs),
+                                    Text(
+                                      context.loc.edit,
+                                      style: context.textStyle.labelSmall.copyWith(
+                                        color: context.color.primary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: context.spacing.xs),
+                            InkWell(
+                              onTap: () => _handleDelete(v),
+                              borderRadius: BorderRadius.circular(context.radius.xs2),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: context.spacing.sm2,
+                                  vertical: context.spacing.xs,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: context.color.errorBg,
+                                  borderRadius: BorderRadius.circular(
+                                    context.radius.xs2,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.delete_outline,
+                                      size: context.sizes.iconXs,
+                                      color: context.color.error,
+                                    ),
+                                    SizedBox(width: context.spacing.xs),
+                                    Text(
+                                      context.loc.delete,
+                                      style: context.textStyle.labelSmall.copyWith(
+                                        color: context.color.error,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
           ),
-      ],
+        );
+      },
     );
   }
 
@@ -888,11 +914,15 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                     label: Text(context.loc.edit),
                     style: OutlinedButton.styleFrom(
                       padding: EdgeInsets.symmetric(
-                        horizontal: context.spacing.md,
-                        vertical: context.spacing.sm2,
+                        horizontal: context.spacing.sm3,
+                        vertical: context.spacing.xs,
                       ),
                       foregroundColor: context.color.primary,
+                      backgroundColor: context.color.surfaceSubtle,
                       side: BorderSide(color: context.color.border),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(context.radius.sm),
+                      ),
                     ),
                   ),
                   SizedBox(width: context.spacing.sm),
@@ -905,12 +935,16 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                     label: Text(context.loc.delete),
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(
-                        horizontal: context.spacing.md,
-                        vertical: context.spacing.sm2,
+                        horizontal: context.spacing.sm3,
+                        vertical: context.spacing.xs,
                       ),
                       backgroundColor: context.color.errorBg,
                       foregroundColor: context.color.error,
                       elevation: 0,
+                      side: BorderSide.none,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(context.radius.sm),
+                      ),
                     ),
                   ),
                 ],
