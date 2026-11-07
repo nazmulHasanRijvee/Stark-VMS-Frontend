@@ -46,7 +46,8 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
     super.initState();
 
     Vehicle? existingVehicle;
-    if (widget.mode == VehicleFormMode.edit && widget.initialVehicleNumber != null) {
+    if (widget.mode == VehicleFormMode.edit &&
+        widget.initialVehicleNumber != null) {
       existingVehicle = ref
           .read(vehiclesProvider.notifier)
           .getVehicle(widget.initialVehicleNumber!);
@@ -58,9 +59,7 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
     _companyController = TextEditingController(
       text: existingVehicle?.company ?? '',
     );
-    _typeController = TextEditingController(
-      text: existingVehicle?.type ?? '',
-    );
+    _typeController = TextEditingController(text: existingVehicle?.type ?? '');
     _brandController = TextEditingController(
       text: existingVehicle?.brand ?? '',
     );
@@ -90,7 +89,9 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
       return;
     }
 
-    final isDuplicate = ref.read(vehiclesProvider.notifier).isDuplicate(
+    final isDuplicate = ref
+        .read(vehiclesProvider.notifier)
+        .isDuplicate(
           value,
           excludeVehicleNumber: widget.mode == VehicleFormMode.edit
               ? widget.initialVehicleNumber
@@ -121,7 +122,9 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
     if (widget.mode == VehicleFormMode.register) {
       error = ref.read(vehiclesProvider.notifier).addVehicle(vehicle);
     } else {
-      error = ref.read(vehiclesProvider.notifier).updateVehicle(
+      error = ref
+          .read(vehiclesProvider.notifier)
+          .updateVehicle(
             widget.initialVehicleNumber ?? vehicle.vehicleNumber,
             vehicle,
           );
@@ -132,15 +135,20 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
       return;
     }
 
-    CustomToast.showSuccess(
-      context,
-      title: widget.mode == VehicleFormMode.register
-          ? context.loc.vehicleRegisteredSuccess
-          : context.loc.vehicleUpdatedSuccess,
-      description: 'Vehicle ${vehicle.vehicleNumber} successfully saved.',
-    );
+    // Capture loc strings before the async gap to avoid stale context.
+    final successTitle = widget.mode == VehicleFormMode.register
+        ? context.loc.vehicleRegisteredSuccess
+        : context.loc.vehicleUpdatedSuccess;
 
-    context.go(Routes.vehicles.path);
+    // Defer toast + navigation to next frame to avoid mutating the widget tree
+    // (OverlayEntry / Navigator) during a pointer-event dispatch cycle, which
+    // triggers Flutter's mouse_tracker.dart:199 "!_debugDuringDeviceUpdate" assertion.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      CustomToast.showSuccess(context, title: successTitle);
+      ref.read(vehicleFilterProvider.notifier).reset();
+      context.go(Routes.vehicles.path);
+    });
   }
 
   InputDecoration _buildInputDecoration({
@@ -256,7 +264,9 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
                 // Form Container
                 Container(
                   padding: EdgeInsets.all(
-                    screenWidth < 600 ? context.spacing.lg : context.spacing.xxl,
+                    screenWidth < 600
+                        ? context.spacing.lg
+                        : context.spacing.xxl,
                   ),
                   decoration: BoxDecoration(
                     color: context.color.surface,
@@ -264,7 +274,9 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
                     border: Border.all(color: context.color.border),
                     boxShadow: [
                       BoxShadow(
-                        color: context.color.text.primary.withValues(alpha: 0.04),
+                        color: context.color.text.primary.withValues(
+                          alpha: 0.04,
+                        ),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),

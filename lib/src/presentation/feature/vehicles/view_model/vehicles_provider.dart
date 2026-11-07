@@ -84,8 +84,9 @@ class VehiclesNotifier extends Notifier<List<Vehicle>> {
   }
 }
 
-final vehiclesProvider =
-    NotifierProvider<VehiclesNotifier, List<Vehicle>>(VehiclesNotifier.new);
+final vehiclesProvider = NotifierProvider<VehiclesNotifier, List<Vehicle>>(
+  VehiclesNotifier.new,
+);
 
 // =============================================================================
 // Filters & Search State
@@ -93,18 +94,17 @@ final vehiclesProvider =
 
 @immutable
 class VehicleFilterState {
+  static const allStatuses = 'All';
+
   final String searchQuery;
-  final String statusFilter; // 'All Statuses' or 'Active', 'In Service', 'Inactive'
+  final String statusFilter;
 
   const VehicleFilterState({
     this.searchQuery = '',
-    this.statusFilter = AppStrings.allStatuses,
+    this.statusFilter = allStatuses,
   });
 
-  VehicleFilterState copyWith({
-    String? searchQuery,
-    String? statusFilter,
-  }) {
+  VehicleFilterState copyWith({String? searchQuery, String? statusFilter}) {
     return VehicleFilterState(
       searchQuery: searchQuery ?? this.searchQuery,
       statusFilter: statusFilter ?? this.statusFilter,
@@ -131,8 +131,8 @@ class VehicleFilterNotifier extends Notifier<VehicleFilterState> {
 
 final vehicleFilterProvider =
     NotifierProvider<VehicleFilterNotifier, VehicleFilterState>(
-  VehicleFilterNotifier.new,
-);
+      VehicleFilterNotifier.new,
+    );
 
 /// Derived list of vehicles matching current search query and status filter.
 final filteredVehiclesProvider = Provider<List<Vehicle>>((ref) {
@@ -143,14 +143,16 @@ final filteredVehiclesProvider = Provider<List<Vehicle>>((ref) {
   final status = filter.statusFilter;
 
   return vehicles.where((v) {
-    final matchesQuery = query.isEmpty ||
+    final matchesQuery =
+        query.isEmpty ||
         v.vehicleNumber.toLowerCase().contains(query) ||
         v.brand.toLowerCase().contains(query) ||
         v.model.toLowerCase().contains(query) ||
         v.company.toLowerCase().contains(query) ||
         v.type.toLowerCase().contains(query);
 
-    final matchesStatus = status == AppStrings.allStatuses ||
+    final matchesStatus =
+        status == VehicleFilterState.allStatuses ||
         v.status.toLowerCase() == status.toLowerCase();
 
     return matchesQuery && matchesStatus;
@@ -212,4 +214,3 @@ final recentlyAddedVehiclesProvider = Provider<List<Vehicle>>((ref) {
   final vehicles = ref.watch(vehiclesProvider);
   return vehicles.take(4).toList();
 });
-

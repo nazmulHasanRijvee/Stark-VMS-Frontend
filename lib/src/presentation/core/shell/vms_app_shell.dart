@@ -4,7 +4,6 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../core/extensions/localization_extension.dart';
 import '../../feature/auth/view_model/mock_auth_provider.dart';
-import '../router/routes.dart';
 import '../theme/theme.dart';
 import '../widgets/language_selector_pill.dart';
 import '../widgets/theme_mode_button.dart';
@@ -17,10 +16,7 @@ import '../widgets/theme_mode_button.dart';
 class VmsAppShell extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
 
-  const VmsAppShell({
-    super.key,
-    required this.navigationShell,
-  });
+  const VmsAppShell({super.key, required this.navigationShell});
 
   void _onNavigate(int index) {
     navigationShell.goBranch(
@@ -42,11 +38,7 @@ class VmsAppShell extends ConsumerWidget {
           : Drawer(
               backgroundColor: context.color.sidebarBackground,
               child: SafeArea(
-                child: _buildSidebarContent(
-                  context,
-                  ref,
-                  isDrawer: true,
-                ),
+                child: _buildSidebarContent(context, ref, isDrawer: true),
               ),
             ),
       body: Row(
@@ -56,18 +48,14 @@ class VmsAppShell extends ConsumerWidget {
               width: context.sizes.sidebarWidth,
               child: ColoredBox(
                 color: context.color.sidebarBackground,
-                child: SafeArea(
-                  child: _buildSidebarContent(context, ref),
-                ),
+                child: SafeArea(child: _buildSidebarContent(context, ref)),
               ),
             ),
           Expanded(
             child: Column(
               children: [
-                _buildHeader(context, ref, isDesktop, authState),
-                Expanded(
-                  child: navigationShell,
-                ),
+                _buildHeader(context, isDesktop, authState),
+                Expanded(child: navigationShell),
               ],
             ),
           ),
@@ -92,9 +80,7 @@ class VmsAppShell extends ConsumerWidget {
           padding: EdgeInsets.symmetric(horizontal: context.spacing.lg2),
           decoration: BoxDecoration(
             border: Border(
-              bottom: BorderSide(
-                color: context.color.sidebarBorder,
-              ),
+              bottom: BorderSide(color: context.color.sidebarBorder),
             ),
           ),
           child: Row(
@@ -159,7 +145,10 @@ class VmsAppShell extends ConsumerWidget {
         const Spacer(),
 
         // Bottom Logout Item
-        Divider(color: context.color.sidebarBorder, height: context.spacing.xxxs),
+        Divider(
+          color: context.color.sidebarBorder,
+          height: context.spacing.xxxs,
+        ),
         Padding(
           padding: EdgeInsets.all(context.spacing.md),
           child: InkWell(
@@ -210,7 +199,9 @@ class VmsAppShell extends ConsumerWidget {
           vertical: context.spacing.sm3,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? context.color.primary : context.color.sidebarBackground,
+          color: isSelected
+              ? context.color.primary
+              : context.color.sidebarBackground,
           borderRadius: BorderRadius.circular(context.radius.sm),
         ),
         child: Row(
@@ -218,14 +209,18 @@ class VmsAppShell extends ConsumerWidget {
             Icon(
               icon,
               size: context.sizes.iconMd,
-              color: isSelected ? context.color.onPrimary : context.color.text.tertiary,
+              color: isSelected
+                  ? context.color.onPrimary
+                  : context.color.text.tertiary,
             ),
             SizedBox(width: context.spacing.md),
             Text(
               label,
               style: context.textStyle.bodyMedium.copyWith(
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? context.color.onPrimary : context.color.text.secondary,
+                color: isSelected
+                    ? context.color.onPrimary
+                    : context.color.text.secondary,
               ),
             ),
           ],
@@ -236,7 +231,6 @@ class VmsAppShell extends ConsumerWidget {
 
   Widget _buildHeader(
     BuildContext context,
-    WidgetRef ref,
     bool isDesktop,
     MockAuthState authState,
   ) {
@@ -255,9 +249,7 @@ class VmsAppShell extends ConsumerWidget {
       padding: EdgeInsets.symmetric(horizontal: context.spacing.xl),
       decoration: BoxDecoration(
         color: context.color.surface,
-        border: Border(
-          bottom: BorderSide(color: context.color.border),
-        ),
+        border: Border(bottom: BorderSide(color: context.color.border)),
         boxShadow: [
           BoxShadow(
             color: context.color.text.primary.withValues(alpha: 0.04),
@@ -334,47 +326,19 @@ class VmsAppShell extends ConsumerWidget {
               ],
             ],
           ),
-
-          SizedBox(width: context.spacing.md),
-
-          // Log Out button
-          InkWell(
-            onTap: () => _handleLogout(context, ref),
-            borderRadius: BorderRadius.circular(context.radius.xs2),
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.spacing.sm,
-                vertical: context.spacing.sm2,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.logout_rounded,
-                    size: context.sizes.xs,
-                    color: context.color.error,
-                  ),
-                  if (isDesktop) ...[
-                    SizedBox(width: context.spacing.xs),
-                    Text(
-                      context.loc.signOut,
-                      style: context.textStyle.bodySmall.copyWith(
-                        fontWeight: FontWeight.w500,
-                        color: context.color.error,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
         ],
       ),
     );
   }
 
   void _handleLogout(BuildContext context, WidgetRef ref) {
-    ref.read(mockAuthProvider.notifier).logout();
-    context.go(Routes.login.path);
+    // Defer state mutation to the next frame to avoid triggering a widget-tree
+    // rebuild (and GoRouter redirect) during an active pointer-event dispatch,
+    // which causes the mouse_tracker.dart:199 "!_debugDuringDeviceUpdate" assertion.
+    // The router's refreshListenable watches mockAuthProvider, so calling
+    // logout() is sufficient — no manual context.go() needed.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(mockAuthProvider.notifier).logout();
+    });
   }
 }

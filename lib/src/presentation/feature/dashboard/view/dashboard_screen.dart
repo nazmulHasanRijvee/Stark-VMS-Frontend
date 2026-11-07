@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../../core/extensions/localization_extension.dart';
+import '../../../../domain/entities/vehicle.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/status_chip.dart';
@@ -13,11 +14,26 @@ import '../../vehicles/view_model/vehicles_provider.dart';
 ///
 /// Fully theme-aware (Light & Dark) and localized (English & Bangla)
 /// without hardcoded colors or styles.
-class DashboardScreen extends ConsumerWidget {
+class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  /// Defers route changes to the next frame to avoid triggering a Navigator
+  /// mutation during an active pointer-event dispatch cycle, which causes the
+  /// mouse_tracker.dart:199 "!_debugDuringDeviceUpdate" Flutter assertion.
+  void _navigateTo(String path) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.go(path);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final stats = ref.watch(dashboardStatsProvider);
     final recentVehicles = ref.watch(recentlyAddedVehiclesProvider);
     final screenWidth = MediaQuery.sizeOf(context).width;
@@ -49,7 +65,7 @@ class DashboardScreen extends ConsumerWidget {
                       ),
                     ),
                     ElevatedButton.icon(
-                      onPressed: () => context.go(Routes.vehicleRegister.path),
+                      onPressed: () => _navigateTo(Routes.vehicleRegister.path),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: context.color.primary,
                         foregroundColor: context.color.onPrimary,
@@ -59,7 +75,9 @@ class DashboardScreen extends ConsumerWidget {
                           vertical: context.spacing.md,
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(context.radius.sm),
+                          borderRadius: BorderRadius.circular(
+                            context.radius.sm,
+                          ),
                         ),
                       ),
                       icon: Icon(Icons.add, size: context.sizes.iconSm),
@@ -77,7 +95,7 @@ class DashboardScreen extends ConsumerWidget {
                 SizedBox(height: context.spacing.xl),
 
                 // 4 Summary KPI Cards
-                _buildKpiGrid(context, stats, screenWidth),
+                _buildKpiGrid(stats, screenWidth),
 
                 SizedBox(height: context.spacing.xl),
 
@@ -89,7 +107,9 @@ class DashboardScreen extends ConsumerWidget {
                     border: Border.all(color: context.color.border),
                     boxShadow: [
                       BoxShadow(
-                        color: context.color.text.primary.withValues(alpha: 0.04),
+                        color: context.color.text.primary.withValues(
+                          alpha: 0.04,
+                        ),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
@@ -112,7 +132,9 @@ class DashboardScreen extends ConsumerWidget {
                             ),
                             if (recentVehicles.isNotEmpty)
                               TextButton(
-                                onPressed: () => context.go(Routes.vehicles.path),
+                                onPressed: () => _openVehicleList(
+                                  VehicleFilterState.allStatuses,
+                                ),
                                 child: Text(
                                   context.loc.viewAll,
                                   style: context.textStyle.labelLarge.copyWith(
@@ -130,11 +152,11 @@ class DashboardScreen extends ConsumerWidget {
                       ),
 
                       if (recentVehicles.isEmpty)
-                        _buildEmptyState(context)
+                        _buildEmptyState()
                       else if (screenWidth < 640)
-                        _buildMobileRecentList(context, recentVehicles)
+                        _buildMobileRecentList(recentVehicles)
                       else
-                        _buildDesktopRecentTable(context, recentVehicles),
+                        _buildDesktopRecentTable(recentVehicles),
                     ],
                   ),
                 ),
@@ -147,7 +169,6 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   Widget _buildKpiGrid(
-    BuildContext context,
     DashboardStats stats,
     double screenWidth,
   ) {
@@ -160,6 +181,7 @@ class DashboardScreen extends ConsumerWidget {
               label: context.loc.totalFleet,
               value: '${stats.total}',
               valueColor: context.color.text.primary,
+              onTap: () => _openVehicleList(VehicleFilterState.allStatuses),
             ),
           ),
           SizedBox(width: context.spacing.lg),
@@ -168,6 +190,7 @@ class DashboardScreen extends ConsumerWidget {
               label: context.loc.activeVehicles,
               value: '${stats.active}',
               valueColor: context.color.success,
+              onTap: () => _openVehicleList(Vehicle.statusActive),
             ),
           ),
           SizedBox(width: context.spacing.lg),
@@ -176,6 +199,7 @@ class DashboardScreen extends ConsumerWidget {
               label: context.loc.inServiceVehicles,
               value: '${stats.inService}',
               valueColor: context.color.warning,
+              onTap: () => _openVehicleList(Vehicle.statusInService),
             ),
           ),
           SizedBox(width: context.spacing.lg),
@@ -184,6 +208,7 @@ class DashboardScreen extends ConsumerWidget {
               label: context.loc.inactiveVehicles,
               value: '${stats.inactive}',
               valueColor: context.color.text.secondary,
+              onTap: () => _openVehicleList(Vehicle.statusInactive),
             ),
           ),
         ],
@@ -199,6 +224,8 @@ class DashboardScreen extends ConsumerWidget {
                   label: context.loc.totalFleet,
                   value: '${stats.total}',
                   valueColor: context.color.text.primary,
+                  onTap: () =>
+                      _openVehicleList(VehicleFilterState.allStatuses),
                 ),
               ),
               SizedBox(width: context.spacing.lg),
@@ -207,6 +234,7 @@ class DashboardScreen extends ConsumerWidget {
                   label: context.loc.activeVehicles,
                   value: '${stats.active}',
                   valueColor: context.color.success,
+                  onTap: () => _openVehicleList(Vehicle.statusActive),
                 ),
               ),
             ],
@@ -219,6 +247,7 @@ class DashboardScreen extends ConsumerWidget {
                   label: context.loc.inServiceVehicles,
                   value: '${stats.inService}',
                   valueColor: context.color.warning,
+                  onTap: () => _openVehicleList(Vehicle.statusInService),
                 ),
               ),
               SizedBox(width: context.spacing.lg),
@@ -227,6 +256,7 @@ class DashboardScreen extends ConsumerWidget {
                   label: context.loc.inactiveVehicles,
                   value: '${stats.inactive}',
                   valueColor: context.color.text.secondary,
+                  onTap: () => _openVehicleList(Vehicle.statusInactive),
                 ),
               ),
             ],
@@ -241,31 +271,35 @@ class DashboardScreen extends ConsumerWidget {
             label: context.loc.totalFleet,
             value: '${stats.total}',
             valueColor: context.color.text.primary,
+            onTap: () => _openVehicleList(VehicleFilterState.allStatuses),
           ),
           SizedBox(height: context.spacing.md),
           SummaryKpiCard(
             label: context.loc.activeVehicles,
             value: '${stats.active}',
             valueColor: context.color.success,
+            onTap: () => _openVehicleList(Vehicle.statusActive),
           ),
           SizedBox(height: context.spacing.md),
           SummaryKpiCard(
             label: context.loc.inServiceVehicles,
             value: '${stats.inService}',
             valueColor: context.color.warning,
+            onTap: () => _openVehicleList(Vehicle.statusInService),
           ),
           SizedBox(height: context.spacing.md),
           SummaryKpiCard(
             label: context.loc.inactiveVehicles,
             value: '${stats.inactive}',
             valueColor: context.color.text.secondary,
+            onTap: () => _openVehicleList(Vehicle.statusInactive),
           ),
         ],
       );
     }
   }
 
-  Widget _buildDesktopRecentTable(BuildContext context, List recentVehicles) {
+  Widget _buildDesktopRecentTable(List<Vehicle> recentVehicles) {
     return Table(
       columnWidths: const {
         0: FlexColumnWidth(1.4),
@@ -298,7 +332,8 @@ class DashboardScreen extends ConsumerWidget {
                 vertical: context.spacing.md,
               ),
               child: Text(
-                '${context.loc.colBrand} & ${context.loc.colModel}'.toUpperCase(),
+                '${context.loc.colBrand} & ${context.loc.colModel}'
+                    .toUpperCase(),
                 style: context.textStyle.labelSmall.copyWith(
                   fontWeight: FontWeight.w700,
                   color: context.color.text.secondary,
@@ -326,7 +361,8 @@ class DashboardScreen extends ConsumerWidget {
               border: Border(bottom: BorderSide(color: context.color.border)),
             ),
             children: [
-              Padding(
+              _buildRecentVehicleCell(
+                v,
                 padding: EdgeInsets.symmetric(
                   horizontal: context.spacing.lg2,
                   vertical: context.spacing.md2,
@@ -339,7 +375,8 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              Padding(
+              _buildRecentVehicleCell(
+                v,
                 padding: EdgeInsets.symmetric(
                   horizontal: context.spacing.lg2,
                   vertical: context.spacing.md2,
@@ -351,7 +388,8 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              Padding(
+              _buildRecentVehicleCell(
+                v,
                 padding: EdgeInsets.symmetric(
                   horizontal: context.spacing.lg2,
                   vertical: context.spacing.md,
@@ -367,7 +405,18 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMobileRecentList(BuildContext context, List recentVehicles) {
+  Widget _buildRecentVehicleCell(
+    Vehicle vehicle, {
+    required EdgeInsets padding,
+    required Widget child,
+  }) {
+    return InkWell(
+      onTap: () => _openVehicleEditor(vehicle),
+      child: Padding(padding: padding, child: child),
+    );
+  }
+
+  Widget _buildMobileRecentList(List<Vehicle> recentVehicles) {
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -376,46 +425,66 @@ class DashboardScreen extends ConsumerWidget {
         height: context.sizes.hairlineWidth,
         color: context.color.border,
       ),
-      itemBuilder: (context, index) {
+      itemBuilder: (_, index) {
         final v = recentVehicles[index];
-        return Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: context.spacing.lg,
-            vertical: context.spacing.md,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      v.vehicleNumber,
-                      style: context.textStyle.bodyMedium.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: context.color.text.primary,
+        return InkWell(
+          onTap: () => _openVehicleEditor(v),
+          borderRadius: BorderRadius.circular(context.radius.sm),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: context.spacing.lg,
+              vertical: context.spacing.md,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        v.vehicleNumber,
+                        style: context.textStyle.bodyMedium.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: context.color.text.primary,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: context.spacing.xxs),
-                    Text(
-                      '${v.brand} ${v.model}',
-                      style: context.textStyle.bodySmall.copyWith(
-                        color: context.color.text.secondary,
+                      SizedBox(height: context.spacing.xxs),
+                      Text(
+                        '${v.brand} ${v.model}',
+                        style: context.textStyle.bodySmall.copyWith(
+                          color: context.color.text.secondary,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              StatusChip(status: v.status),
-            ],
+                StatusChip(status: v.status),
+              ],
+            ),
           ),
         );
       },
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
+  void _openVehicleList(String status) {
+    final filter = ref.read(vehicleFilterProvider.notifier);
+    filter
+      ..setSearch('')
+      ..setStatus(status);
+    _navigateTo(Routes.vehicles.path);
+  }
+
+  void _openVehicleEditor(Vehicle vehicle) {
+    final path = Routes.vehicleEdit.path.replaceFirst(
+      ':vehicleNumber',
+      Uri.encodeComponent(vehicle.vehicleNumber),
+    );
+    _navigateTo(path);
+  }
+
+  Widget _buildEmptyState() {
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: context.spacing.xl,
@@ -455,7 +524,7 @@ class DashboardScreen extends ConsumerWidget {
           ),
           SizedBox(height: context.spacing.lg2),
           ElevatedButton.icon(
-            onPressed: () => context.go(Routes.vehicleRegister.path),
+            onPressed: () => _navigateTo(Routes.vehicleRegister.path),
             style: ElevatedButton.styleFrom(
               backgroundColor: context.color.primary,
               foregroundColor: context.color.onPrimary,

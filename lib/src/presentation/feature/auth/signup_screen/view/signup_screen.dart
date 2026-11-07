@@ -5,7 +5,6 @@ import 'package:material_ui/material_ui.dart';
 import '../../../../../core/extensions/localization_extension.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../core/theme/theme.dart';
-import '../../../../core/widgets/custom_toast.dart';
 import '../../../../core/widgets/language_selector_pill.dart';
 import '../../../../core/widgets/theme_mode_button.dart';
 import '../../view_model/mock_auth_provider.dart';
@@ -30,6 +29,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _signupQueued = false;
 
   @override
   void dispose() {
@@ -41,23 +41,26 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   }
 
   void _submit() {
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (_signupQueued || !(_formKey.currentState?.validate() ?? false)) return;
 
-    final success = ref.read(mockAuthProvider.notifier).signUp(
-          fullName: _fullNameController.text,
-          email: _emailController.text,
-          password: _passwordController.text,
-          confirmPassword: _confirmPasswordController.text,
-        );
+    _signupQueued = true;
+    final fullName = _fullNameController.text;
+    final email = _emailController.text;
+    final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
 
-    if (success) {
-      CustomToast.showSuccess(
-        context,
-        title: context.loc.accountCreatedTitle,
-        description: context.loc.accountCreatedMessage,
-      );
-      context.go(Routes.dashboard.path);
-    }
+    // Let the current pointer/frame update finish before auth state refreshes
+    // GoRouter and replaces this route.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _signupQueued = false;
+      ref.read(mockAuthProvider.notifier).signUp(
+            fullName: fullName,
+            email: email,
+            password: password,
+            confirmPassword: confirmPassword,
+          );
+    });
   }
 
   InputDecoration _buildInputDecoration({

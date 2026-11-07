@@ -25,6 +25,16 @@ class VehiclesScreen extends ConsumerStatefulWidget {
 class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
   final _searchController = TextEditingController();
 
+  /// Defers route changes to the next frame to avoid triggering a Navigator
+  /// mutation during an active pointer-event dispatch cycle, which causes the
+  /// mouse_tracker.dart:199 "!_debugDuringDeviceUpdate" Flutter assertion.
+  void _navigateTo(String path) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.go(path);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -52,6 +62,18 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
     ref.read(vehicleFilterProvider.notifier).reset();
   }
 
+  void _openVehicleEditor(Vehicle vehicle) {
+    final path = Routes.vehicleEdit.path.replaceFirst(
+      ':vehicleNumber',
+      Uri.encodeComponent(vehicle.vehicleNumber),
+    );
+    // Defer navigation to next frame to avoid triggering a route change during
+    // a pointer-event dispatch cycle (mouse_tracker.dart:199 assertion).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.go(path);
+    });
+  }
   Future<void> _handleDelete(Vehicle vehicle) async {
     final confirmed = await DeleteConfirmDialog.show(
       context,
@@ -63,13 +85,24 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
       CustomToast.showSuccess(
         context,
         title: context.loc.vehicleDeletedSuccess,
-        description: 'Vehicle ${vehicle.vehicleNumber} has been removed.',
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<VehicleFilterState>(vehicleFilterProvider, (previous, next) {
+      if (previous?.searchQuery == next.searchQuery ||
+          _searchController.text == next.searchQuery) {
+        return;
+      }
+
+      _searchController.value = TextEditingValue(
+        text: next.searchQuery,
+        selection: TextSelection.collapsed(offset: next.searchQuery.length),
+      );
+    });
+
     final totalVehicles = ref.watch(vehiclesProvider);
     final filteredVehicles = ref.watch(filteredVehiclesProvider);
     final filter = ref.watch(vehicleFilterProvider);
@@ -119,7 +152,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                     ),
                     SizedBox(width: context.spacing.lg),
                     ElevatedButton.icon(
-                      onPressed: () => context.go(Routes.vehicleRegister.path),
+                      onPressed: () => _navigateTo(Routes.vehicleRegister.path),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: context.color.primary,
                         foregroundColor: context.color.onPrimary,
@@ -129,7 +162,9 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                           vertical: context.spacing.md,
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(context.radius.sm),
+                          borderRadius: BorderRadius.circular(
+                            context.radius.sm,
+                          ),
                         ),
                       ),
                       icon: Icon(Icons.add, size: context.sizes.iconSm),
@@ -155,7 +190,9 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                     border: Border.all(color: context.color.border),
                     boxShadow: [
                       BoxShadow(
-                        color: context.color.text.primary.withValues(alpha: 0.04),
+                        color: context.color.text.primary.withValues(
+                          alpha: 0.04,
+                        ),
                         blurRadius: 4,
                         offset: const Offset(0, 1),
                       ),
@@ -168,7 +205,9 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                             SizedBox(height: context.spacing.sm3),
                             Row(
                               children: [
-                                Expanded(child: _buildStatusDropdown(context, filter)),
+                                Expanded(
+                                  child: _buildStatusDropdown(context, filter),
+                                ),
                                 SizedBox(width: context.spacing.sm),
                                 _buildResetButton(context),
                               ],
@@ -199,7 +238,9 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                     border: Border.all(color: context.color.border),
                     boxShadow: [
                       BoxShadow(
-                        color: context.color.text.primary.withValues(alpha: 0.04),
+                        color: context.color.text.primary.withValues(
+                          alpha: 0.04,
+                        ),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
@@ -256,13 +297,17 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                                     ),
                                     padding: EdgeInsets.zero,
                                     constraints: BoxConstraints(
-                                      minWidth: context.sizes.paginationButtonSize,
-                                      minHeight: context.sizes.paginationButtonSize,
+                                      minWidth:
+                                          context.sizes.paginationButtonSize,
+                                      minHeight:
+                                          context.sizes.paginationButtonSize,
                                     ),
                                   ),
                                   Container(
-                                    width: context.sizes.paginationIndicatorSize,
-                                    height: context.sizes.paginationIndicatorSize,
+                                    width:
+                                        context.sizes.paginationIndicatorSize,
+                                    height:
+                                        context.sizes.paginationIndicatorSize,
                                     decoration: BoxDecoration(
                                       color: context.color.primary,
                                       borderRadius: BorderRadius.circular(
@@ -272,10 +317,11 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                                     child: Center(
                                       child: Text(
                                         '1',
-                                        style: context.textStyle.labelSmall.copyWith(
-                                          color: context.color.onPrimary,
-                                          fontWeight: FontWeight.w700,
-                                        ),
+                                        style: context.textStyle.labelSmall
+                                            .copyWith(
+                                              color: context.color.onPrimary,
+                                              fontWeight: FontWeight.w700,
+                                            ),
                                       ),
                                     ),
                                   ),
@@ -288,8 +334,10 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                                     ),
                                     padding: EdgeInsets.zero,
                                     constraints: BoxConstraints(
-                                      minWidth: context.sizes.paginationButtonSize,
-                                      minHeight: context.sizes.paginationButtonSize,
+                                      minWidth:
+                                          context.sizes.paginationButtonSize,
+                                      minHeight:
+                                          context.sizes.paginationButtonSize,
                                     ),
                                   ),
                                 ],
@@ -352,7 +400,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
 
   Widget _buildStatusDropdown(BuildContext context, VehicleFilterState filter) {
     final statuses = [
-      'All',
+      VehicleFilterState.allStatuses,
       Vehicle.statusActive,
       Vehicle.statusInService,
       Vehicle.statusInactive,
@@ -368,9 +416,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          value: filter.statusFilter == 'All' || filter.statusFilter.isEmpty
-              ? 'All'
-              : filter.statusFilter,
+          value: filter.statusFilter,
           isExpanded: true,
           dropdownColor: context.color.surface,
           icon: Icon(
@@ -383,15 +429,12 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
           ),
           items: statuses.map((s) {
             String label;
-            if (s == 'All') {
+            if (s == VehicleFilterState.allStatuses) {
               label = context.loc.allStatuses;
             } else {
               label = context.loc.localizedStatus(s);
             }
-            return DropdownMenuItem<String>(
-              value: s,
-              child: Text(label),
-            );
+            return DropdownMenuItem<String>(value: s, child: Text(label));
           }).toList(),
           onChanged: (val) {
             if (val != null) {
@@ -637,10 +680,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     InkWell(
-                      onTap: () {
-                        final encoded = Uri.encodeComponent(v.vehicleNumber);
-                        context.go('/vehicles/edit/$encoded');
-                      },
+                      onTap: () => _openVehicleEditor(v),
                       borderRadius: BorderRadius.circular(context.radius.xs2),
                       child: Container(
                         padding: EdgeInsets.symmetric(
@@ -649,7 +689,9 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: context.color.surfaceSubtle,
-                          borderRadius: BorderRadius.circular(context.radius.xs2),
+                          borderRadius: BorderRadius.circular(
+                            context.radius.xs2,
+                          ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -682,7 +724,9 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: context.color.errorBg,
-                          borderRadius: BorderRadius.circular(context.radius.xs2),
+                          borderRadius: BorderRadius.circular(
+                            context.radius.xs2,
+                          ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -839,10 +883,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   OutlinedButton.icon(
-                    onPressed: () {
-                      final encoded = Uri.encodeComponent(v.vehicleNumber);
-                      context.go('/vehicles/edit/$encoded');
-                    },
+                    onPressed: () => _openVehicleEditor(v),
                     icon: Icon(Icons.edit_outlined, size: context.sizes.iconXs),
                     label: Text(context.loc.edit),
                     style: OutlinedButton.styleFrom(
@@ -857,7 +898,10 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                   SizedBox(width: context.spacing.sm),
                   ElevatedButton.icon(
                     onPressed: () => _handleDelete(v),
-                    icon: Icon(Icons.delete_outline, size: context.sizes.iconXs),
+                    icon: Icon(
+                      Icons.delete_outline,
+                      size: context.sizes.iconXs,
+                    ),
                     label: Text(context.loc.delete),
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(
@@ -939,7 +983,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
             )
           else
             ElevatedButton.icon(
-              onPressed: () => context.go(Routes.vehicleRegister.path),
+              onPressed: () => _navigateTo(Routes.vehicleRegister.path),
               icon: Icon(Icons.add, size: context.sizes.xs),
               label: Text(context.loc.registerVehicle),
               style: ElevatedButton.styleFrom(

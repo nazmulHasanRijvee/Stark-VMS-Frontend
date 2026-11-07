@@ -5,7 +5,6 @@ import 'package:material_ui/material_ui.dart';
 import '../../../../../core/extensions/localization_extension.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../core/theme/theme.dart';
-import '../../../../core/widgets/custom_toast.dart';
 import '../../../../core/widgets/language_selector_pill.dart';
 import '../../../../core/widgets/theme_mode_button.dart';
 import '../../view_model/mock_auth_provider.dart';
@@ -26,6 +25,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController(text: 'admin@stark.com');
   final _passwordController = TextEditingController(text: 'password123');
   bool _obscurePassword = true;
+  bool _loginQueued = false;
 
   @override
   void dispose() {
@@ -35,21 +35,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _submit() {
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (_loginQueued || !(_formKey.currentState?.validate() ?? false)) return;
 
-    final success = ref.read(mockAuthProvider.notifier).login(
-          email: _emailController.text,
-          password: _passwordController.text,
-        );
+    _loginQueued = true;
+    final email = _emailController.text;
+    final password = _passwordController.text;
 
-    if (success) {
-      CustomToast.showSuccess(
-        context,
-        title: context.loc.appName,
-        description: context.loc.accountCreatedMessage,
-      );
-      context.go(Routes.dashboard.path);
-    }
+    // Let the current pointer/frame update finish before auth state refreshes
+    // GoRouter and replaces this route.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _loginQueued = false;
+      ref.read(mockAuthProvider.notifier).login(
+            email: email,
+            password: password,
+          );
+    });
   }
 
   InputDecoration _buildInputDecoration({
