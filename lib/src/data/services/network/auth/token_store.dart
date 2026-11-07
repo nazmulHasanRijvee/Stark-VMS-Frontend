@@ -1,4 +1,4 @@
-enum TokenKey { access, refresh }
+enum TokenKey { access }
 
 /// Storage contract for auth tokens.
 

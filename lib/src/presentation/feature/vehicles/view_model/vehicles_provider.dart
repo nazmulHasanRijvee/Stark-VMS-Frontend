@@ -50,7 +50,10 @@ class VehiclesNotifier extends Notifier<List<Vehicle>> {
       return AppStrings.duplicateVehicleError;
     }
 
-    state = [vehicle, ...state];
+    final normalized = vehicle.copyWith(
+      vehicleNumber: vehicle.vehicleNumber.trim().toUpperCase(),
+    );
+    state = [normalized, ...state];
     return null;
   }
 

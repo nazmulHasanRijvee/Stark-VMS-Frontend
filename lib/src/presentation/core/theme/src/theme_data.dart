@@ -19,10 +19,7 @@ class $LightThemeData with ThemeExtensions {
         surface: lightColor.surface,
         onSurface: lightColor.text.primary,
       ),
-      cardTheme: CardThemeData(
-        color: lightColor.surface,
-        elevation: 0,
-      ),
+      cardTheme: CardThemeData(color: lightColor.surface, elevation: 0),
       appBarTheme: _AppBarLightTheme()(),
       scaffoldBackgroundColor: lightColor.scaffoldBackground,
       bottomNavigationBarTheme: _BottomNavigationBarLightThemeData()(),
@@ -50,10 +47,7 @@ class $DarkThemeData with ThemeExtensions {
         surface: darkColor.surface,
         onSurface: darkColor.text.primary,
       ),
-      cardTheme: CardThemeData(
-        color: darkColor.surface,
-        elevation: 0,
-      ),
+      cardTheme: CardThemeData(color: darkColor.surface, elevation: 0),
       appBarTheme: _AppBarDarkTheme()(),
       scaffoldBackgroundColor: darkColor.scaffoldBackground,
       bottomNavigationBarTheme: _BottomNavigationBarDarkThemeData()(),

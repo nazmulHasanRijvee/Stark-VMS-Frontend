@@ -65,10 +65,7 @@ void main() {
 
     test('logout clears user state', () {
       final notifier = container.read(mockAuthProvider.notifier);
-      notifier.login(
-        email: 'admin@stark.com',
-        password: 'password123',
-      );
+      notifier.login(email: 'admin@stark.com', password: 'password123');
       expect(container.read(mockAuthProvider).isAuthenticated, isTrue);
 
       notifier.logout();
@@ -76,4 +73,3 @@ void main() {
     });
   });
 }
-

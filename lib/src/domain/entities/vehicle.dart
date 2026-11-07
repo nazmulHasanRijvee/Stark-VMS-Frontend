@@ -92,4 +92,3 @@ class Vehicle {
   String toString() =>
       'Vehicle($vehicleNumber, $company, $type, $brand, $model, $status)';
 }
-

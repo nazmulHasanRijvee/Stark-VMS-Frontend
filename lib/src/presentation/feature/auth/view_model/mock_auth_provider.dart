@@ -21,11 +21,11 @@ class MockAuthState {
   });
 
   factory MockAuthState.initial() => const MockAuthState(
-        isAuthenticated: false,
-        userName: 'John Doe',
-        userEmail: 'john.doe@stark.com',
-        errorMessage: null,
-      );
+    isAuthenticated: false,
+    userName: 'John Doe',
+    userEmail: 'john.doe@stark.com',
+    errorMessage: null,
+  );
 
   MockAuthState copyWith({
     bool? isAuthenticated,
@@ -52,7 +52,14 @@ class MockAuthNotifier extends Notifier<MockAuthState> {
   bool login({required String email, required String password}) {
     final trimmedEmail = email.trim();
     if (trimmedEmail.isEmpty || password.isEmpty) {
-      state = state.copyWith(errorMessage: 'Please enter both email and password.');
+      state = state.copyWith(
+        errorMessage: 'Please enter both email and password.',
+      );
+      return false;
+    }
+
+    if (trimmedEmail != 'admin@stark.com' || password != 'password123') {
+      state = state.copyWith(errorMessage: 'Invalid email or password.');
       return false;
     }
 
@@ -103,4 +110,3 @@ class MockAuthNotifier extends Notifier<MockAuthState> {
 final mockAuthProvider = NotifierProvider<MockAuthNotifier, MockAuthState>(
   MockAuthNotifier.new,
 );
-

@@ -5,7 +5,6 @@ part 'shared_preference_service.dart';
 
 enum CacheKey {
   accessToken,
-  refreshToken,
   isLoggedIn,
   isOnBoardingCompleted,
   rememberMe,

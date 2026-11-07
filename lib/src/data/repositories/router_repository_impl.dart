@@ -20,9 +20,9 @@ class RouterRepositoryImpl extends RouterRepository {
 
   @override
   Future<bool> hasSession() async {
-    final refreshToken = await tokens.refreshToken;
+    final accessToken = await tokens.accessToken;
 
-    return refreshToken != null && refreshToken.isNotEmpty;
+    return accessToken != null && accessToken.isNotEmpty;
   }
 
   @override

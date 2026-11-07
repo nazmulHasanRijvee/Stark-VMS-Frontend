@@ -14,7 +14,10 @@ class DeleteConfirmDialog extends StatelessWidget {
     required this.onConfirm,
   });
 
-  static Future<bool?> show(BuildContext context, {required String vehicleNumber}) {
+  static Future<bool?> show(
+    BuildContext context, {
+    required String vehicleNumber,
+  }) {
     return showDialog<bool>(
       context: context,
       barrierDismissible: true,
@@ -128,7 +131,10 @@ class DeleteConfirmDialog extends StatelessWidget {
                         borderRadius: BorderRadius.circular(context.radius.sm),
                       ),
                     ),
-                    icon: Icon(Icons.delete_outline, size: context.sizes.iconSm),
+                    icon: Icon(
+                      Icons.delete_outline,
+                      size: context.sizes.iconSm,
+                    ),
                     label: Text(
                       context.loc.delete,
                       style: context.textStyle.labelMedium.copyWith(

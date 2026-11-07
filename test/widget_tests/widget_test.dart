@@ -4,11 +4,7 @@ import 'package:stark_vms/app.dart';
 
 void main() {
   testWidgets('Stark VMS app smoke test', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: MyApp(),
-      ),
-    );
+    await tester.pumpWidget(const ProviderScope(child: MyApp()));
     await tester.pumpAndSettle();
 
     // Verify Stark VMS brand tag renders on screen

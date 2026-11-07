@@ -21,7 +21,9 @@ import 'routes.dart';
 part 'parts/authentication_routes.dart';
 part 'parts/onboarding_routes.dart';
 
-final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'RootNavigator');
+final _rootNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'RootNavigator',
+);
 
 final routerProvider = Provider<GoRouter>((ref) {
   final refreshListenable = ref.asListenable(mockAuthProvider);
@@ -58,9 +60,8 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: Routes.dashboard.path,
                 name: Routes.dashboard.name,
-                pageBuilder: (context, state) => const NoTransitionPage(
-                  child: DashboardScreen(),
-                ),
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage(child: DashboardScreen()),
               ),
             ],
           ),
@@ -71,9 +72,8 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: Routes.vehicles.path,
                 name: Routes.vehicles.name,
-                pageBuilder: (context, state) => const NoTransitionPage(
-                  child: VehiclesScreen(),
-                ),
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage(child: VehiclesScreen()),
                 routes: [
                   GoRoute(
                     path: 'register',
@@ -90,7 +90,8 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: 'edit/:vehicleNumber',
                     name: Routes.vehicleEdit.name,
                     pageBuilder: (context, state) {
-                      final rawNumber = state.pathParameters['vehicleNumber'] ?? '';
+                      final rawNumber =
+                          state.pathParameters['vehicleNumber'] ?? '';
                       final vehicleNumber = Uri.decodeComponent(rawNumber);
                       return buildTransitionPage(
                         child: VehicleFormScreen(

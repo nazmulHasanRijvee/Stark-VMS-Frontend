@@ -4,5 +4,4 @@ class Endpoints {
   /// Authentication
   static const String register = '/auth/register/';
   static const String login = '/auth/login';
-  static const String refreshToken = '/auth/refresh_token/';
 }

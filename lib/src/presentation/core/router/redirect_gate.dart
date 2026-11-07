@@ -9,8 +9,8 @@ abstract final class RedirectGate {
     required String currentPath,
     required bool isAuthenticated,
   }) {
-    final isAuthFlow = currentPath == Routes.login.path ||
-        currentPath == Routes.signup.path;
+    final isAuthFlow =
+        currentPath == Routes.login.path || currentPath == Routes.signup.path;
 
     if (!isAuthenticated) {
       // Unauthenticated users are allowed on login & signup, otherwise sent to login

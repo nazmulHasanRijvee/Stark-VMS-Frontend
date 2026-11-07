@@ -168,10 +168,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildKpiGrid(
-    DashboardStats stats,
-    double screenWidth,
-  ) {
+  Widget _buildKpiGrid(DashboardStats stats, double screenWidth) {
     if (screenWidth >= 1024) {
       // 4 in a single row on desktop
       return Row(
@@ -224,8 +221,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   label: context.loc.totalFleet,
                   value: '${stats.total}',
                   valueColor: context.color.text.primary,
-                  onTap: () =>
-                      _openVehicleList(VehicleFilterState.allStatuses),
+                  onTap: () => _openVehicleList(VehicleFilterState.allStatuses),
                 ),
               ),
               SizedBox(width: context.spacing.lg),

@@ -18,7 +18,10 @@ void main() {
     test('initial state contains exactly 4 seed vehicles', () {
       final vehicles = container.read(vehiclesProvider);
       expect(vehicles.length, 4);
-      expect(vehicles.any((v) => v.vehicleNumber == 'DHAKA METRO GA-12-3456'), isTrue);
+      expect(
+        vehicles.any((v) => v.vehicleNumber == 'DHAKA METRO GA-12-3456'),
+        isTrue,
+      );
     });
 
     test('adds a new vehicle with uppercase vehicleNumber', () {
@@ -63,24 +66,30 @@ void main() {
       expect(container.read(vehiclesProvider).length, 4);
     });
 
-    test('updates existing vehicle without duplicate error on its own plate', () {
-      final notifier = container.read(vehiclesProvider.notifier);
-      const updatedVehicle = Vehicle(
-        vehicleNumber: 'DHAKA METRO GA-12-3456',
-        company: 'Stark Corp Updated',
-        type: 'Heavy Truck',
-        brand: 'Scania',
-        model: 'R500',
-        status: Vehicle.statusInService,
-      );
+    test(
+      'updates existing vehicle without duplicate error on its own plate',
+      () {
+        final notifier = container.read(vehiclesProvider.notifier);
+        const updatedVehicle = Vehicle(
+          vehicleNumber: 'DHAKA METRO GA-12-3456',
+          company: 'Stark Corp Updated',
+          type: 'Heavy Truck',
+          brand: 'Scania',
+          model: 'R500',
+          status: Vehicle.statusInService,
+        );
 
-      final error = notifier.updateVehicle('DHAKA METRO GA-12-3456', updatedVehicle);
-      expect(error, isNull);
+        final error = notifier.updateVehicle(
+          'DHAKA METRO GA-12-3456',
+          updatedVehicle,
+        );
+        expect(error, isNull);
 
-      final vehicle = notifier.getVehicle('DHAKA METRO GA-12-3456');
-      expect(vehicle?.company, 'Stark Corp Updated');
-      expect(vehicle?.status, Vehicle.statusInService);
-    });
+        final vehicle = notifier.getVehicle('DHAKA METRO GA-12-3456');
+        expect(vehicle?.company, 'Stark Corp Updated');
+        expect(vehicle?.status, Vehicle.statusInService);
+      },
+    );
 
     test('deletes a vehicle by vehicleNumber', () {
       final notifier = container.read(vehiclesProvider.notifier);
@@ -88,7 +97,10 @@ void main() {
 
       final vehicles = container.read(vehiclesProvider);
       expect(vehicles.length, 3);
-      expect(vehicles.any((v) => v.vehicleNumber == 'DHAKA METRO GA-12-3456'), isFalse);
+      expect(
+        vehicles.any((v) => v.vehicleNumber == 'DHAKA METRO GA-12-3456'),
+        isFalse,
+      );
     });
 
     test('calculates accurate dashboard stats', () {
@@ -100,13 +112,15 @@ void main() {
     });
 
     test('filters vehicles by search query and status', () {
-      container.read(vehicleFilterProvider.notifier).setSearch('Land Cruiser');
+      container.read(vehicleFilterProvider.notifier).setSearch('Urvan');
       var filtered = container.read(filteredVehiclesProvider);
       expect(filtered.length, 1);
       expect(filtered.first.vehicleNumber, 'DHAKA METRO CHA-55-9812');
 
       container.read(vehicleFilterProvider.notifier).reset();
-      container.read(vehicleFilterProvider.notifier).setStatus(Vehicle.statusActive);
+      container
+          .read(vehicleFilterProvider.notifier)
+          .setStatus(Vehicle.statusActive);
       filtered = container.read(filteredVehiclesProvider);
       expect(filtered.length, 2);
       for (final v in filtered) {
@@ -115,4 +129,3 @@ void main() {
     });
   });
 }
-

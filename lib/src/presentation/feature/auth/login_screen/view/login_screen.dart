@@ -46,10 +46,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _loginQueued = false;
-      ref.read(mockAuthProvider.notifier).login(
-            email: email,
-            password: password,
-          );
+      ref
+          .read(mockAuthProvider.notifier)
+          .login(email: email, password: password);
     });
   }
 
@@ -198,7 +197,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         padding: EdgeInsets.all(context.spacing.md),
                         decoration: BoxDecoration(
                           color: context.color.errorBg,
-                          borderRadius: BorderRadius.circular(context.radius.sm),
+                          borderRadius: BorderRadius.circular(
+                            context.radius.sm,
+                          ),
                           border: Border.all(
                             color: context.color.error.withValues(alpha: 0.3),
                           ),
@@ -304,7 +305,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         elevation: 1,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(context.radius.sm),
+                          borderRadius: BorderRadius.circular(
+                            context.radius.sm,
+                          ),
                         ),
                       ),
                       icon: Icon(
@@ -336,7 +339,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         SizedBox(width: context.spacing.xs),
                         InkWell(
                           onTap: () => context.go(Routes.signup.path),
-                          borderRadius: BorderRadius.circular(context.radius.xs),
+                          borderRadius: BorderRadius.circular(
+                            context.radius.xs,
+                          ),
                           child: Padding(
                             padding: EdgeInsets.symmetric(
                               horizontal: context.spacing.xs,

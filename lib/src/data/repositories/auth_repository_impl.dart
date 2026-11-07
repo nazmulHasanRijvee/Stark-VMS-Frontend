@@ -28,10 +28,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     await Api.call(
       action: remote.login({'username': username, 'password': password}),
       onSuccess: (data) async {
-        await tokens.saveTokens(
-          access: data['accessToken'] as String,
-          refresh: data['refreshToken'] as String,
-        );
+        await tokens.saveTokens(access: data['accessToken'] as String);
 
         if (shouldRemember) {
           try {
@@ -69,13 +66,13 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   Future<bool> restoreSession() async {
     final remembered = local.get<bool>(CacheKey.isLoggedIn) ?? false;
 
-    final refreshToken = await tokens.refreshToken;
-    final hasSession = refreshToken != null && refreshToken.isNotEmpty;
+    final accessToken = await tokens.accessToken;
+    final hasSession = accessToken != null && accessToken.isNotEmpty;
 
     if (!remembered && hasSession) {
       await tokens.clearSession();
     }
-    return remembered;
+    return remembered && hasSession;
   }
 
   @override

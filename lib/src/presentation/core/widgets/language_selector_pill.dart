@@ -49,7 +49,9 @@ class LanguageSelectorPill extends ConsumerWidget {
                 boxShadow: isEn
                     ? [
                         BoxShadow(
-                          color: context.color.text.primary.withValues(alpha: 0.06),
+                          color: context.color.text.primary.withValues(
+                            alpha: 0.06,
+                          ),
                           blurRadius: 2,
                           offset: const Offset(0, 1),
                         ),
@@ -92,7 +94,9 @@ class LanguageSelectorPill extends ConsumerWidget {
                 boxShadow: !isEn
                     ? [
                         BoxShadow(
-                          color: context.color.text.primary.withValues(alpha: 0.06),
+                          color: context.color.text.primary.withValues(
+                            alpha: 0.06,
+                          ),
                           blurRadius: 2,
                           offset: const Offset(0, 1),
                         ),

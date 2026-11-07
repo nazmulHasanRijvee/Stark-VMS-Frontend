@@ -1,7 +1,7 @@
 part of 'colors.dart';
 
 /// Primitive color palette
-/// 
+///
 /// Mapped directly to Stitch design tokens for Stark VMS.
 class _Primitive {
   // ===========================================================================
@@ -105,7 +105,7 @@ class _Primitive {
   // ===========================================================================
   // 6. STATUS / FEEDBACK & BADGES
   // ===========================================================================
-  
+
   /// Stitch: Active Status Green
   static const Color success = Color(0xFF059669);
   static const Color successBgLight = Color(0xFFECFDF5);

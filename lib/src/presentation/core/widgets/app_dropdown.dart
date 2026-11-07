@@ -137,15 +137,15 @@ class _AppDropdownState<T> extends State<AppDropdown<T>> {
                 ),
                 if (field.hasError)
                   Padding(
-                      padding: EdgeInsets.only(
-                        top: dimensions.spacing.sm,
-                        left: dimensions.spacing.md,
-                      ),
+                    padding: EdgeInsets.only(
+                      top: dimensions.spacing.sm,
+                      left: dimensions.spacing.md,
+                    ),
                     child: Text(
                       field.errorText!,
-                        style: context.textStyle.bodySmall.copyWith(
-                          color: colors.error,
-                        ),
+                      style: context.textStyle.bodySmall.copyWith(
+                        color: colors.error,
+                      ),
                     ),
                   ),
               ],

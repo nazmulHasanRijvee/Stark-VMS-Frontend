@@ -1,5 +1,3 @@
-
-
 import 'package:material_ui/material_ui.dart';
 
 part 'color_extension.dart';

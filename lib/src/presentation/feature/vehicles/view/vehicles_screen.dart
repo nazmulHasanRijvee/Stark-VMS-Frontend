@@ -76,6 +76,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
       context.go(path);
     });
   }
+
   Future<void> _handleDelete(Vehicle vehicle) async {
     final confirmed = await DeleteConfirmDialog.show(
       context,
@@ -506,7 +507,9 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                 TableRow(
                   decoration: BoxDecoration(
                     color: context.color.surfaceSubtle,
-                    border: Border(bottom: BorderSide(color: context.color.border)),
+                    border: Border(
+                      bottom: BorderSide(color: context.color.border),
+                    ),
                   ),
                   children: [
                     Padding(
@@ -608,7 +611,9 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                 for (final v in vehicles)
                   TableRow(
                     decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(color: context.color.border)),
+                      border: Border(
+                        bottom: BorderSide(color: context.color.border),
+                      ),
                     ),
                     children: [
                       Padding(
@@ -703,7 +708,9 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                           children: [
                             InkWell(
                               onTap: () => _openVehicleEditor(v),
-                              borderRadius: BorderRadius.circular(context.radius.xs2),
+                              borderRadius: BorderRadius.circular(
+                                context.radius.xs2,
+                              ),
                               child: Container(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: context.spacing.sm2,
@@ -726,10 +733,11 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                                     SizedBox(width: context.spacing.xs),
                                     Text(
                                       context.loc.edit,
-                                      style: context.textStyle.labelSmall.copyWith(
-                                        color: context.color.primary,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                      style: context.textStyle.labelSmall
+                                          .copyWith(
+                                            color: context.color.primary,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -738,7 +746,9 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                             SizedBox(width: context.spacing.xs),
                             InkWell(
                               onTap: () => _handleDelete(v),
-                              borderRadius: BorderRadius.circular(context.radius.xs2),
+                              borderRadius: BorderRadius.circular(
+                                context.radius.xs2,
+                              ),
                               child: Container(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: context.spacing.sm2,
@@ -761,10 +771,11 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                                     SizedBox(width: context.spacing.xs),
                                     Text(
                                       context.loc.delete,
-                                      style: context.textStyle.labelSmall.copyWith(
-                                        color: context.color.error,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                      style: context.textStyle.labelSmall
+                                          .copyWith(
+                                            color: context.color.error,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                     ),
                                   ],
                                 ),

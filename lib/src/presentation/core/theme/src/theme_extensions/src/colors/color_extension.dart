@@ -48,7 +48,7 @@ abstract interface class ColorExtension {
   final Color sidebarBorder;
   final Color border;
   final Color icon;
-  
+
   final Color success;
   final Color successBg;
   final Color successFg;
@@ -325,10 +325,18 @@ class LightColorExtension extends ThemeExtension<LightColorExtension>
       secondary: Color.lerp(secondary, other.secondary, t)!,
       onPrimary: Color.lerp(onPrimary, other.onPrimary, t)!,
       accent: t < 0.5 ? accent : other.accent,
-      scaffoldBackground: Color.lerp(scaffoldBackground, other.scaffoldBackground, t)!,
+      scaffoldBackground: Color.lerp(
+        scaffoldBackground,
+        other.scaffoldBackground,
+        t,
+      )!,
       surface: Color.lerp(surface, other.surface, t)!,
       surfaceSubtle: Color.lerp(surfaceSubtle, other.surfaceSubtle, t)!,
-      sidebarBackground: Color.lerp(sidebarBackground, other.sidebarBackground, t)!,
+      sidebarBackground: Color.lerp(
+        sidebarBackground,
+        other.sidebarBackground,
+        t,
+      )!,
       sidebarBorder: Color.lerp(sidebarBorder, other.sidebarBorder, t)!,
       border: Color.lerp(border, other.border, t)!,
       icon: Color.lerp(icon, other.icon, t)!,
@@ -347,10 +355,21 @@ class LightColorExtension extends ThemeExtension<LightColorExtension>
       disabled: Color.lerp(disabled, other.disabled, t)!,
       active: Color.lerp(active, other.active, t)!,
       inactive: Color.lerp(inactive, other.inactive, t)!,
-      textFieldFillColor: Color.lerp(textFieldFillColor, other.textFieldFillColor, t)!,
-      textFieldBorderColor: Color.lerp(textFieldBorderColor, other.textFieldBorderColor, t)!,
-      textFieldFocusBorderColor:
-          Color.lerp(textFieldFocusBorderColor, other.textFieldFocusBorderColor, t)!,
+      textFieldFillColor: Color.lerp(
+        textFieldFillColor,
+        other.textFieldFillColor,
+        t,
+      )!,
+      textFieldBorderColor: Color.lerp(
+        textFieldBorderColor,
+        other.textFieldBorderColor,
+        t,
+      )!,
+      textFieldFocusBorderColor: Color.lerp(
+        textFieldFocusBorderColor,
+        other.textFieldFocusBorderColor,
+        t,
+      )!,
       text: t < 0.5 ? text : other.text,
       appBar: t < 0.5 ? appBar : other.appBar,
       bottomNavBar: t < 0.5 ? bottomNavBar : other.bottomNavBar,
@@ -597,10 +616,18 @@ class DarkColorExtension extends ThemeExtension<DarkColorExtension>
       secondary: Color.lerp(secondary, other.secondary, t)!,
       onPrimary: Color.lerp(onPrimary, other.onPrimary, t)!,
       accent: t < 0.5 ? accent : other.accent,
-      scaffoldBackground: Color.lerp(scaffoldBackground, other.scaffoldBackground, t)!,
+      scaffoldBackground: Color.lerp(
+        scaffoldBackground,
+        other.scaffoldBackground,
+        t,
+      )!,
       surface: Color.lerp(surface, other.surface, t)!,
       surfaceSubtle: Color.lerp(surfaceSubtle, other.surfaceSubtle, t)!,
-      sidebarBackground: Color.lerp(sidebarBackground, other.sidebarBackground, t)!,
+      sidebarBackground: Color.lerp(
+        sidebarBackground,
+        other.sidebarBackground,
+        t,
+      )!,
       sidebarBorder: Color.lerp(sidebarBorder, other.sidebarBorder, t)!,
       border: Color.lerp(border, other.border, t)!,
       icon: Color.lerp(icon, other.icon, t)!,
@@ -619,10 +646,21 @@ class DarkColorExtension extends ThemeExtension<DarkColorExtension>
       disabled: Color.lerp(disabled, other.disabled, t)!,
       active: Color.lerp(active, other.active, t)!,
       inactive: Color.lerp(inactive, other.inactive, t)!,
-      textFieldFillColor: Color.lerp(textFieldFillColor, other.textFieldFillColor, t)!,
-      textFieldBorderColor: Color.lerp(textFieldBorderColor, other.textFieldBorderColor, t)!,
-      textFieldFocusBorderColor:
-          Color.lerp(textFieldFocusBorderColor, other.textFieldFocusBorderColor, t)!,
+      textFieldFillColor: Color.lerp(
+        textFieldFillColor,
+        other.textFieldFillColor,
+        t,
+      )!,
+      textFieldBorderColor: Color.lerp(
+        textFieldBorderColor,
+        other.textFieldBorderColor,
+        t,
+      )!,
+      textFieldFocusBorderColor: Color.lerp(
+        textFieldFocusBorderColor,
+        other.textFieldFocusBorderColor,
+        t,
+      )!,
       text: t < 0.5 ? text : other.text,
       appBar: t < 0.5 ? appBar : other.appBar,
       bottomNavBar: t < 0.5 ? bottomNavBar : other.bottomNavBar,

@@ -13,7 +13,8 @@ class ThemeModeButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
-    final isDark = themeMode == ThemeMode.dark ||
+    final isDark =
+        themeMode == ThemeMode.dark ||
         (themeMode == ThemeMode.system &&
             MediaQuery.platformBrightnessOf(context) == Brightness.dark);
 
@@ -21,9 +22,9 @@ class ThemeModeButton extends ConsumerWidget {
       message: isDark ? 'Switch to light mode' : 'Switch to dark mode',
       child: InkWell(
         onTap: () {
-          ref.read(themeModeProvider.notifier).changeTheme(
-                isDark ? ThemeMode.light : ThemeMode.dark,
-              );
+          ref
+              .read(themeModeProvider.notifier)
+              .changeTheme(isDark ? ThemeMode.light : ThemeMode.dark);
         },
         borderRadius: BorderRadius.circular(context.radius.sm),
         child: Container(

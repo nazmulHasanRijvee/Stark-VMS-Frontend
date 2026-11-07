@@ -54,7 +54,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _signupQueued = false;
-      ref.read(mockAuthProvider.notifier).signUp(
+      ref
+          .read(mockAuthProvider.notifier)
+          .signUp(
             fullName: fullName,
             email: email,
             password: password,
@@ -208,7 +210,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         padding: EdgeInsets.all(context.spacing.md),
                         decoration: BoxDecoration(
                           color: context.color.errorBg,
-                          borderRadius: BorderRadius.circular(context.radius.sm),
+                          borderRadius: BorderRadius.circular(
+                            context.radius.sm,
+                          ),
                           border: Border.all(
                             color: context.color.error.withValues(alpha: 0.3),
                           ),
@@ -366,7 +370,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                           ),
                           onPressed: () {
                             setState(() {
-                              _obscureConfirmPassword = !_obscureConfirmPassword;
+                              _obscureConfirmPassword =
+                                  !_obscureConfirmPassword;
                             });
                           },
                         ),
@@ -395,7 +400,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         ),
                         elevation: 1,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(context.radius.sm),
+                          borderRadius: BorderRadius.circular(
+                            context.radius.sm,
+                          ),
                         ),
                       ),
                       icon: Icon(
@@ -427,7 +434,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         SizedBox(width: context.spacing.xs),
                         InkWell(
                           onTap: () => context.go(Routes.login.path),
-                          borderRadius: BorderRadius.circular(context.radius.xs),
+                          borderRadius: BorderRadius.circular(
+                            context.radius.xs,
+                          ),
                           child: Padding(
                             padding: EdgeInsets.symmetric(
                               horizontal: context.spacing.xs,

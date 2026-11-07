@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 
 import 'crash_reporter.dart';
 
-
 void initializeCrashReporting(CrashReporter reporter) {
   /// Handles errors raised by Flutter during build, layout, or painting.
   FlutterError.onError = (details) {

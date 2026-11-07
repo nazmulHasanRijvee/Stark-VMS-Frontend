@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stark_vms/src/core/localization/app_localizations.dart';
 import 'package:stark_vms/src/presentation/core/theme/src/theme_extensions/src/colors/colors.dart';
@@ -26,24 +27,29 @@ void main() {
       expect(locBn.statusActive, 'সক্রিয়');
       expect(locBn.statusInService, 'সার্ভিসাধীন');
       expect(locBn.statusInactive, 'নিষ্ক্রিয়');
-      expect(locBn.showingPagination(1, 4, 4), '4 টির মধ্যে 1 থেকে 4 টি দেখানো হচ্ছে');
+      expect(
+        locBn.showingPagination(1, 4, 4),
+        '4 টির মধ্যে 1 থেকে 4 টি দেখানো হচ্ছে',
+      );
     });
   });
 
   group('Theme Colors', () {
-    test('Light and Dark color extensions provide valid contrast and tokens', () {
-      const light = LightColorExtension();
-      const dark = DarkColorExtension();
+    test(
+      'Light and Dark color extensions provide valid contrast and tokens',
+      () {
+        const light = LightColorExtension();
+        const dark = DarkColorExtension();
 
-      expect(light.primary, isNotNull);
-      expect(dark.primary, isNotNull);
-      expect(light.surface, const Color(0xFFFFFFFF));
-      expect(dark.surface, const Color(0xFF1E293B));
-      expect(light.scaffoldBackground, const Color(0xFFF8FAFC));
-      expect(dark.scaffoldBackground, const Color(0xFF0B1120));
-      expect(light.statusActiveBg, isNotNull);
-      expect(dark.statusActiveBg, isNotNull);
-    });
+        expect(light.primary, isNotNull);
+        expect(dark.primary, isNotNull);
+        expect(light.surface, const Color(0xFFFFFFFF));
+        expect(dark.surface, const Color(0xFF1E293B));
+        expect(light.scaffoldBackground, const Color(0xFFF8FAFC));
+        expect(dark.scaffoldBackground, const Color(0xFF0B1120));
+        expect(light.statusActiveBg, isNotNull);
+        expect(dark.statusActiveBg, isNotNull);
+      },
+    );
   });
 }
-
