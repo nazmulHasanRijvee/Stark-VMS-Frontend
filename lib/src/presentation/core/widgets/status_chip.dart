@@ -40,8 +40,8 @@ class StatusChip extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: context.spacing.md - 2, // 10px
-        vertical: context.spacing.xs - 0.5, // 3.5px
+        horizontal: context.spacing.sm3, // 10px
+        vertical: context.spacing.xs, // 3.5px
       ),
       decoration: BoxDecoration(
         color: bg,

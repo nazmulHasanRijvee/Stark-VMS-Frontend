@@ -1,9 +1,9 @@
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:toastification/toastification.dart';
 
 import 'src/core/constants/app_strings.dart';
+import 'src/core/localization/app_localization_delegates.dart';
 import 'src/core/localization/app_localizations.dart';
 import 'src/presentation/core/application_state/localization_provider/localization_provider.dart';
 import 'src/presentation/core/application_state/theme_mode_provider/theme_mode_provider.dart';
@@ -27,16 +27,8 @@ class MyApp extends ConsumerWidget {
         darkTheme: context.darkTheme,
         themeMode: themeMode,
         locale: locale,
-        supportedLocales: const [
-          Locale('en'),
-          Locale('bn'),
-        ],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: appLocalizationDelegates,
         routerConfig: router,
       ),
     );

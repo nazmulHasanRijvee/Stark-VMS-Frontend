@@ -62,8 +62,7 @@ class _AppDropdownState<T> extends State<AppDropdown<T>> {
         if (widget.label != null) ...[
           Text(
             widget.label!,
-            style: TextStyle(
-              fontSize: 14,
+            style: context.textStyle.labelLarge.copyWith(
               fontWeight: FontWeight.w500,
               color: colors.text.primary,
             ),
@@ -84,8 +83,7 @@ class _AppDropdownState<T> extends State<AppDropdown<T>> {
                     hint: widget.hint != null
                         ? Text(
                             widget.hint!,
-                            style: TextStyle(
-                              fontSize: 14,
+                            style: context.textStyle.bodyMedium.copyWith(
                               color: colors.text.secondary,
                             ),
                           )
@@ -95,8 +93,7 @@ class _AppDropdownState<T> extends State<AppDropdown<T>> {
                         value: item,
                         child: Text(
                           widget.itemAsString?.call(item) ?? item.toString(),
-                          style: TextStyle(
-                            fontSize: 14,
+                          style: context.textStyle.bodyMedium.copyWith(
                             color: colors.text.primary,
                           ),
                         ),
@@ -108,24 +105,24 @@ class _AppDropdownState<T> extends State<AppDropdown<T>> {
                       widget.onChanged(val);
                     },
                     buttonStyleData: ButtonStyleData(
-                      height: 48,
+                      height: context.sizes.lg,
                       padding: EdgeInsets.symmetric(
-                        horizontal: dimensions.spacing.xs,
+                        horizontal: dimensions.spacing.sm,
                       ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(
-                          dimensions.radius.md,
+                          dimensions.radius.sm,
                         ),
                         border: Border.all(
                           color: field.hasError ? colors.error : colors.border,
                         ),
-                        color: colors.onPrimary,
+                        color: colors.textFieldFillColor,
                       ),
                     ),
                     dropdownStyleData: DropdownStyleData(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(
-                          dimensions.radius.md,
+                          dimensions.radius.sm,
                         ),
                         color: colors.onPrimary,
                       ),
@@ -140,10 +137,15 @@ class _AppDropdownState<T> extends State<AppDropdown<T>> {
                 ),
                 if (field.hasError)
                   Padding(
-                    padding: const EdgeInsets.only(top: 8, left: 12),
+                      padding: EdgeInsets.only(
+                        top: dimensions.spacing.sm,
+                        left: dimensions.spacing.md,
+                      ),
                     child: Text(
                       field.errorText!,
-                      style: TextStyle(color: colors.error, fontSize: 12),
+                        style: context.textStyle.bodySmall.copyWith(
+                          color: colors.error,
+                        ),
                     ),
                   ),
               ],

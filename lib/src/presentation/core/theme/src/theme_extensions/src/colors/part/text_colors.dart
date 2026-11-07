@@ -18,7 +18,7 @@ class _LightTextColors extends TextColors {
   Color get secondary => _Primitive.textSecondaryLight;
 
   @override
-  Color get tertiary => _Primitive.unselected;
+  Color get tertiary => _Primitive.textTertiaryLight;
 }
 
 class _DarkTextColors extends TextColors {

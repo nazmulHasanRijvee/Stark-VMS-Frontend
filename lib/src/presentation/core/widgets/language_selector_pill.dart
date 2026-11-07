@@ -34,20 +34,22 @@ class LanguageSelectorPill extends ConsumerWidget {
                     .changeLocale(const Locale('en'));
               }
             },
-            borderRadius: BorderRadius.circular(context.radius.xs + 2),
+            borderRadius: BorderRadius.circular(context.radius.xs2),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 150),
               padding: EdgeInsets.symmetric(
                 horizontal: context.spacing.sm,
-                vertical: context.spacing.xs - 1,
+                vertical: context.spacing.xs,
               ),
               decoration: BoxDecoration(
-                color: isEn ? context.color.surface : Colors.transparent,
-                borderRadius: BorderRadius.circular(context.radius.xs + 2),
+                color: isEn
+                    ? context.color.surface
+                    : context.color.surfaceSubtle,
+                borderRadius: BorderRadius.circular(context.radius.xs2),
                 boxShadow: isEn
                     ? [
                         BoxShadow(
-                          color: context.color.text.primary.withOpacity(0.06),
+                          color: context.color.text.primary.withValues(alpha: 0.06),
                           blurRadius: 2,
                           offset: const Offset(0, 1),
                         ),
@@ -75,20 +77,22 @@ class LanguageSelectorPill extends ConsumerWidget {
                     .changeLocale(const Locale('bn'));
               }
             },
-            borderRadius: BorderRadius.circular(context.radius.xs + 2),
+            borderRadius: BorderRadius.circular(context.radius.xs2),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 150),
               padding: EdgeInsets.symmetric(
                 horizontal: context.spacing.sm,
-                vertical: context.spacing.xs - 1,
+                vertical: context.spacing.xs,
               ),
               decoration: BoxDecoration(
-                color: !isEn ? context.color.surface : Colors.transparent,
-                borderRadius: BorderRadius.circular(context.radius.xs + 2),
+                color: isEn
+                    ? context.color.surfaceSubtle
+                    : context.color.surface,
+                borderRadius: BorderRadius.circular(context.radius.xs2),
                 boxShadow: !isEn
                     ? [
                         BoxShadow(
-                          color: context.color.text.primary.withOpacity(0.06),
+                          color: context.color.text.primary.withValues(alpha: 0.06),
                           blurRadius: 2,
                           offset: const Offset(0, 1),
                         ),

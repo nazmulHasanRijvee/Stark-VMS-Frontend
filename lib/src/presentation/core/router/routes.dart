@@ -3,10 +3,9 @@
 /// [path] is the URL segment handed to `GoRoute.path`;
 /// [name] is what `GoRoute.name` and named navigation use.
 enum Routes {
-  // Legacy & Startup Gates (Preserved for compatibility)
+  // Startup Gates
   splash('/splash'),
   onboarding('/onboarding'),
-  homeScreen('/dashboard'),
 
   // Public Auth Routes
   login('/login'),

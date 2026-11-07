@@ -73,14 +73,14 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       ),
       prefixIcon: Icon(
         prefixIcon,
-        size: context.sizes.xs + 2,
+        size: context.sizes.iconSm,
         color: context.color.icon,
       ),
       suffixIcon: suffixIcon,
       filled: true,
       fillColor: context.color.textFieldFillColor,
       contentPadding: EdgeInsets.symmetric(
-        horizontal: context.spacing.md + 2,
+        horizontal: context.spacing.md2,
         vertical: context.spacing.md,
       ),
       border: OutlineInputBorder(
@@ -95,7 +95,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         borderRadius: BorderRadius.circular(context.radius.sm),
         borderSide: BorderSide(
           color: context.color.primary,
-          width: 1.5,
+          width: context.sizes.focusStrokeWidth,
         ),
       ),
       errorBorder: OutlineInputBorder(
@@ -106,7 +106,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         borderRadius: BorderRadius.circular(context.radius.sm),
         borderSide: BorderSide(
           color: context.color.error,
-          width: 1.5,
+          width: context.sizes.focusStrokeWidth,
         ),
       ),
     );
@@ -125,16 +125,18 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
             vertical: context.spacing.xl,
           ),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 440),
+            constraints: BoxConstraints(
+              maxWidth: context.sizes.authCardMaxWidth,
+            ),
             child: Container(
-              padding: EdgeInsets.all(context.spacing.xxl - 4), // 28px
+              padding: EdgeInsets.all(context.spacing.xl2), // 28px
               decoration: BoxDecoration(
                 color: context.color.surface,
                 borderRadius: BorderRadius.circular(context.radius.lg),
                 border: Border.all(color: context.color.border),
                 boxShadow: [
                   BoxShadow(
-                    color: context.color.text.primary.withOpacity(0.06),
+                    color: context.color.text.primary.withValues(alpha: 0.06),
                     blurRadius: 20,
                     offset: const Offset(0, 4),
                   ),
@@ -161,7 +163,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             Text(
                               context.loc.brandTag,
                               style: context.textStyle.headLineSmall.copyWith(
-                                fontSize: 15,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 0.8,
                                 color: context.color.text.primary,
@@ -179,7 +180,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       ],
                     ),
 
-                    SizedBox(height: context.spacing.xxl - 4),
+                    SizedBox(height: context.spacing.xl2),
 
                     // Title
                     Text(
@@ -206,7 +207,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                           color: context.color.errorBg,
                           borderRadius: BorderRadius.circular(context.radius.sm),
                           border: Border.all(
-                            color: context.color.error.withOpacity(0.3),
+                            color: context.color.error.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Text(
@@ -308,7 +309,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             _obscurePassword
                                 ? Icons.visibility_outlined
                                 : Icons.visibility_off_outlined,
-                            size: context.sizes.xs + 2,
+                            size: context.sizes.iconSm,
                             color: context.color.icon,
                           ),
                           onPressed: () {
@@ -357,7 +358,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             _obscureConfirmPassword
                                 ? Icons.visibility_outlined
                                 : Icons.visibility_off_outlined,
-                            size: context.sizes.xs + 2,
+                            size: context.sizes.iconSm,
                             color: context.color.icon,
                           ),
                           onPressed: () {
@@ -387,7 +388,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         backgroundColor: context.color.primary,
                         foregroundColor: context.color.onPrimary,
                         padding: EdgeInsets.symmetric(
-                          vertical: context.spacing.md + 1,
+                          vertical: context.spacing.md2,
                         ),
                         elevation: 1,
                         shape: RoundedRectangleBorder(
@@ -396,7 +397,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       ),
                       icon: Icon(
                         Icons.person_add_outlined,
-                        size: context.sizes.xs + 2,
+                        size: context.sizes.iconSm,
                         color: context.color.onPrimary,
                       ),
                       label: Text(

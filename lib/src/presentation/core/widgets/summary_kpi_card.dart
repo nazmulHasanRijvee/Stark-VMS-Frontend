@@ -25,7 +25,7 @@ class SummaryKpiCard extends StatelessWidget {
         border: Border.all(color: context.color.border),
         boxShadow: [
           BoxShadow(
-            color: context.color.text.primary.withOpacity(0.04),
+            color: context.color.text.primary.withValues(alpha: 0.04),
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),
@@ -38,7 +38,6 @@ class SummaryKpiCard extends StatelessWidget {
           Text(
             label.toUpperCase(),
             style: context.textStyle.labelSmall.copyWith(
-              fontSize: 11,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.8,
               color: context.color.text.secondary,
@@ -47,10 +46,7 @@ class SummaryKpiCard extends StatelessWidget {
           SizedBox(height: context.spacing.xs),
           Text(
             value,
-            style: context.textStyle.headLineLarge.copyWith(
-              fontSize: 28,
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.5,
+            style: context.textStyle.metricLarge.copyWith(
               color: valueColor ?? context.color.text.primary,
             ),
           ),

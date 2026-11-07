@@ -84,7 +84,9 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
         ),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1200),
+            constraints: BoxConstraints(
+              maxWidth: context.sizes.contentMaxWidth,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -130,7 +132,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                           borderRadius: BorderRadius.circular(context.radius.sm),
                         ),
                       ),
-                      icon: Icon(Icons.add, size: context.sizes.xs + 2),
+                      icon: Icon(Icons.add, size: context.sizes.iconSm),
                       label: Text(
                         context.loc.registerVehicle,
                         style: context.textStyle.labelMedium.copyWith(
@@ -153,7 +155,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                     border: Border.all(color: context.color.border),
                     boxShadow: [
                       BoxShadow(
-                        color: context.color.text.primary.withOpacity(0.04),
+                        color: context.color.text.primary.withValues(alpha: 0.04),
                         blurRadius: 4,
                         offset: const Offset(0, 1),
                       ),
@@ -163,7 +165,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                       ? Column(
                           children: [
                             _buildSearchInput(context),
-                            SizedBox(height: context.spacing.sm2 + 4),
+                            SizedBox(height: context.spacing.sm3),
                             Row(
                               children: [
                                 Expanded(child: _buildStatusDropdown(context, filter)),
@@ -178,7 +180,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                             Expanded(child: _buildSearchInput(context)),
                             SizedBox(width: context.spacing.md),
                             SizedBox(
-                              width: 190,
+                              width: context.sizes.filterInputWidth,
                               child: _buildStatusDropdown(context, filter),
                             ),
                             SizedBox(width: context.spacing.sm),
@@ -197,7 +199,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                     border: Border.all(color: context.color.border),
                     boxShadow: [
                       BoxShadow(
-                        color: context.color.text.primary.withOpacity(0.04),
+                        color: context.color.text.primary.withValues(alpha: 0.04),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
@@ -221,7 +223,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                         Container(
                           padding: EdgeInsets.symmetric(
                             horizontal: context.spacing.lg2,
-                            vertical: context.spacing.md + 2,
+                            vertical: context.spacing.md2,
                           ),
                           decoration: BoxDecoration(
                             color: context.color.surfaceSubtle,
@@ -249,22 +251,22 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                                     onPressed: null,
                                     icon: Icon(
                                       Icons.chevron_left,
-                                      size: context.sizes.xs + 2,
+                                      size: context.sizes.iconSm,
                                       color: context.color.text.tertiary,
                                     ),
                                     padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(
-                                      minWidth: 32,
-                                      minHeight: 32,
+                                    constraints: BoxConstraints(
+                                      minWidth: context.sizes.paginationButtonSize,
+                                      minHeight: context.sizes.paginationButtonSize,
                                     ),
                                   ),
                                   Container(
-                                    width: 28,
-                                    height: 28,
+                                    width: context.sizes.paginationIndicatorSize,
+                                    height: context.sizes.paginationIndicatorSize,
                                     decoration: BoxDecoration(
                                       color: context.color.primary,
                                       borderRadius: BorderRadius.circular(
-                                        context.radius.xs + 2,
+                                        context.radius.xs2,
                                       ),
                                     ),
                                     child: Center(
@@ -272,7 +274,6 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                                         '1',
                                         style: context.textStyle.labelSmall.copyWith(
                                           color: context.color.onPrimary,
-                                          fontSize: 12,
                                           fontWeight: FontWeight.w700,
                                         ),
                                       ),
@@ -282,13 +283,13 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                                     onPressed: null,
                                     icon: Icon(
                                       Icons.chevron_right,
-                                      size: context.sizes.xs + 2,
+                                      size: context.sizes.iconSm,
                                       color: context.color.text.tertiary,
                                     ),
                                     padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(
-                                      minWidth: 32,
-                                      minHeight: 32,
+                                    constraints: BoxConstraints(
+                                      minWidth: context.sizes.paginationButtonSize,
+                                      minHeight: context.sizes.paginationButtonSize,
                                     ),
                                   ),
                                 ],
@@ -321,14 +322,14 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
         ),
         prefixIcon: Icon(
           Icons.search,
-          size: context.sizes.xs + 4,
+          size: context.sizes.iconMd,
           color: context.color.icon,
         ),
         filled: true,
         fillColor: context.color.textFieldFillColor,
         contentPadding: EdgeInsets.symmetric(
-          horizontal: context.spacing.md + 2,
-          vertical: context.spacing.sm2 + 4,
+          horizontal: context.spacing.md2,
+          vertical: context.spacing.sm3,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(context.radius.sm),
@@ -340,7 +341,10 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(context.radius.sm),
-          borderSide: BorderSide(color: context.color.primary, width: 1.5),
+          borderSide: BorderSide(
+            color: context.color.primary,
+            width: context.sizes.focusStrokeWidth,
+          ),
         ),
       ),
     );
@@ -355,7 +359,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
     ];
 
     return Container(
-      height: 42,
+      height: context.sizes.compactControlHeight,
       padding: EdgeInsets.symmetric(horizontal: context.spacing.md),
       decoration: BoxDecoration(
         color: context.color.textFieldFillColor,
@@ -371,12 +375,11 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
           dropdownColor: context.color.surface,
           icon: Icon(
             Icons.expand_more,
-            size: context.sizes.xs + 2,
+            size: context.sizes.iconSm,
             color: context.color.icon,
           ),
-          style: context.textStyle.bodyMedium.copyWith(
+          style: context.textStyle.dataMedium.copyWith(
             color: context.color.text.primary,
-            fontSize: 13,
           ),
           items: statuses.map((s) {
             String label;
@@ -405,8 +408,8 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
       onTap: _resetFilter,
       borderRadius: BorderRadius.circular(context.radius.sm),
       child: Container(
-        height: 42,
-        padding: EdgeInsets.symmetric(horizontal: context.spacing.md + 2),
+        height: context.sizes.compactControlHeight,
+        padding: EdgeInsets.symmetric(horizontal: context.spacing.md2),
         decoration: BoxDecoration(
           color: context.color.surfaceSubtle,
           borderRadius: BorderRadius.circular(context.radius.sm),
@@ -460,9 +463,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
               child: Text(
                 context.loc.colVehicleNumber.toUpperCase(),
                 style: context.textStyle.labelSmall.copyWith(
-                  fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.6,
                   color: context.color.text.secondary,
                 ),
               ),
@@ -475,9 +476,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
               child: Text(
                 context.loc.colCompany.toUpperCase(),
                 style: context.textStyle.labelSmall.copyWith(
-                  fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.6,
                   color: context.color.text.secondary,
                 ),
               ),
@@ -490,9 +489,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
               child: Text(
                 context.loc.colType.toUpperCase(),
                 style: context.textStyle.labelSmall.copyWith(
-                  fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.6,
                   color: context.color.text.secondary,
                 ),
               ),
@@ -505,9 +502,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
               child: Text(
                 context.loc.colBrand.toUpperCase(),
                 style: context.textStyle.labelSmall.copyWith(
-                  fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.6,
                   color: context.color.text.secondary,
                 ),
               ),
@@ -520,9 +515,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
               child: Text(
                 context.loc.colModel.toUpperCase(),
                 style: context.textStyle.labelSmall.copyWith(
-                  fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.6,
                   color: context.color.text.secondary,
                 ),
               ),
@@ -535,9 +528,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
               child: Text(
                 context.loc.colStatus.toUpperCase(),
                 style: context.textStyle.labelSmall.copyWith(
-                  fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.6,
                   color: context.color.text.secondary,
                 ),
               ),
@@ -552,9 +543,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                 child: Text(
                   context.loc.colActions.toUpperCase(),
                   style: context.textStyle.labelSmall.copyWith(
-                    fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    letterSpacing: 0.6,
                     color: context.color.text.secondary,
                   ),
                 ),
@@ -571,7 +560,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
               Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.spacing.lg,
-                  vertical: context.spacing.md + 2,
+                  vertical: context.spacing.md2,
                 ),
                 child: Text(
                   v.vehicleNumber,
@@ -584,12 +573,11 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
               Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.spacing.lg,
-                  vertical: context.spacing.md + 2,
+                  vertical: context.spacing.md2,
                 ),
                 child: Text(
                   v.company,
-                  style: context.textStyle.bodyMedium.copyWith(
-                    fontSize: 13,
+                  style: context.textStyle.dataMedium.copyWith(
                     color: context.color.text.primary,
                   ),
                 ),
@@ -597,12 +585,11 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
               Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.spacing.lg,
-                  vertical: context.spacing.md + 2,
+                  vertical: context.spacing.md2,
                 ),
                 child: Text(
                   v.type,
-                  style: context.textStyle.bodyMedium.copyWith(
-                    fontSize: 13,
+                  style: context.textStyle.dataMedium.copyWith(
                     color: context.color.text.secondary,
                   ),
                 ),
@@ -610,12 +597,11 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
               Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.spacing.lg,
-                  vertical: context.spacing.md + 2,
+                  vertical: context.spacing.md2,
                 ),
                 child: Text(
                   v.brand,
-                  style: context.textStyle.bodyMedium.copyWith(
-                    fontSize: 13,
+                  style: context.textStyle.dataMedium.copyWith(
                     color: context.color.text.primary,
                   ),
                 ),
@@ -623,12 +609,11 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
               Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.spacing.lg,
-                  vertical: context.spacing.md + 2,
+                  vertical: context.spacing.md2,
                 ),
                 child: Text(
                   v.model,
-                  style: context.textStyle.bodyMedium.copyWith(
-                    fontSize: 13,
+                  style: context.textStyle.dataMedium.copyWith(
                     color: context.color.text.secondary,
                   ),
                 ),
@@ -646,7 +631,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
               Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.spacing.lg,
-                  vertical: context.spacing.sm2 + 4,
+                  vertical: context.spacing.sm3,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -656,7 +641,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                         final encoded = Uri.encodeComponent(v.vehicleNumber);
                         context.go('/vehicles/edit/$encoded');
                       },
-                      borderRadius: BorderRadius.circular(context.radius.xs + 2),
+                      borderRadius: BorderRadius.circular(context.radius.xs2),
                       child: Container(
                         padding: EdgeInsets.symmetric(
                           horizontal: context.spacing.sm,
@@ -664,14 +649,14 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: context.color.surfaceSubtle,
-                          borderRadius: BorderRadius.circular(context.radius.xs + 2),
+                          borderRadius: BorderRadius.circular(context.radius.xs2),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
                               Icons.edit_outlined,
-                              size: context.sizes.xs - 2,
+                              size: context.sizes.iconXs,
                               color: context.color.primary,
                             ),
                             SizedBox(width: context.spacing.xs),
@@ -689,7 +674,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                     SizedBox(width: context.spacing.sm2),
                     InkWell(
                       onTap: () => _handleDelete(v),
-                      borderRadius: BorderRadius.circular(context.radius.xs + 2),
+                      borderRadius: BorderRadius.circular(context.radius.xs2),
                       child: Container(
                         padding: EdgeInsets.symmetric(
                           horizontal: context.spacing.sm,
@@ -697,14 +682,14 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: context.color.errorBg,
-                          borderRadius: BorderRadius.circular(context.radius.xs + 2),
+                          borderRadius: BorderRadius.circular(context.radius.xs2),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
                               Icons.delete_outline,
-                              size: context.sizes.xs - 2,
+                              size: context.sizes.iconXs,
                               color: context.color.error,
                             ),
                             SizedBox(width: context.spacing.xs),
@@ -733,7 +718,10 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: vehicles.length,
-      separatorBuilder: (_, _) => Divider(height: 1, color: context.color.border),
+      separatorBuilder: (_, _) => Divider(
+        height: context.sizes.hairlineWidth,
+        color: context.color.border,
+      ),
       itemBuilder: (context, index) {
         final v = vehicles[index];
         return Padding(
@@ -747,8 +735,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                   Expanded(
                     child: Text(
                       v.vehicleNumber,
-                      style: context.textStyle.bodyMedium.copyWith(
-                        fontSize: 15,
+                      style: context.textStyle.bodyLarge.copyWith(
                         fontWeight: FontWeight.w700,
                         color: context.color.text.primary,
                       ),
@@ -757,7 +744,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                   StatusChip(status: v.status),
                 ],
               ),
-              SizedBox(height: context.spacing.sm2 + 4),
+              SizedBox(height: context.spacing.sm3),
               Row(
                 children: [
                   Expanded(
@@ -767,14 +754,12 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                         Text(
                           context.loc.colCompany,
                           style: context.textStyle.labelSmall.copyWith(
-                            fontSize: 11,
                             color: context.color.text.tertiary,
                           ),
                         ),
                         Text(
                           v.company,
-                          style: context.textStyle.bodyMedium.copyWith(
-                            fontSize: 13,
+                          style: context.textStyle.dataMedium.copyWith(
                             fontWeight: FontWeight.w500,
                             color: context.color.text.primary,
                           ),
@@ -789,14 +774,12 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                         Text(
                           context.loc.colType,
                           style: context.textStyle.labelSmall.copyWith(
-                            fontSize: 11,
                             color: context.color.text.tertiary,
                           ),
                         ),
                         Text(
                           v.type,
-                          style: context.textStyle.bodyMedium.copyWith(
-                            fontSize: 13,
+                          style: context.textStyle.dataMedium.copyWith(
                             fontWeight: FontWeight.w500,
                             color: context.color.text.primary,
                           ),
@@ -816,14 +799,12 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                         Text(
                           context.loc.colBrand,
                           style: context.textStyle.labelSmall.copyWith(
-                            fontSize: 11,
                             color: context.color.text.tertiary,
                           ),
                         ),
                         Text(
                           v.brand,
-                          style: context.textStyle.bodyMedium.copyWith(
-                            fontSize: 13,
+                          style: context.textStyle.dataMedium.copyWith(
                             fontWeight: FontWeight.w500,
                             color: context.color.text.primary,
                           ),
@@ -838,14 +819,12 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                         Text(
                           context.loc.colModel,
                           style: context.textStyle.labelSmall.copyWith(
-                            fontSize: 11,
                             color: context.color.text.tertiary,
                           ),
                         ),
                         Text(
                           v.model,
-                          style: context.textStyle.bodyMedium.copyWith(
-                            fontSize: 13,
+                          style: context.textStyle.dataMedium.copyWith(
                             fontWeight: FontWeight.w500,
                             color: context.color.text.primary,
                           ),
@@ -855,7 +834,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: context.spacing.md + 2),
+              SizedBox(height: context.spacing.md2),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -864,7 +843,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                       final encoded = Uri.encodeComponent(v.vehicleNumber);
                       context.go('/vehicles/edit/$encoded');
                     },
-                    icon: Icon(Icons.edit_outlined, size: context.sizes.xs - 2),
+                    icon: Icon(Icons.edit_outlined, size: context.sizes.iconXs),
                     label: Text(context.loc.edit),
                     style: OutlinedButton.styleFrom(
                       padding: EdgeInsets.symmetric(
@@ -878,7 +857,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                   SizedBox(width: context.spacing.sm),
                   ElevatedButton.icon(
                     onPressed: () => _handleDelete(v),
-                    icon: Icon(Icons.delete_outline, size: context.sizes.xs - 2),
+                    icon: Icon(Icons.delete_outline, size: context.sizes.iconXs),
                     label: Text(context.loc.delete),
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(
@@ -920,7 +899,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
             ),
             child: Icon(
               Icons.directions_car_outlined,
-              size: context.sizes.sm + 4,
+              size: context.sizes.iconLg,
               color: context.color.icon,
             ),
           ),
@@ -930,7 +909,6 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                 ? context.loc.noVehiclesMatch
                 : context.loc.noVehiclesInFleet,
             style: context.textStyle.headLineSmall.copyWith(
-              fontSize: 17,
               fontWeight: FontWeight.w700,
               color: context.color.text.primary,
             ),

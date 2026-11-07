@@ -44,11 +44,17 @@ class AppSpacing {
   /// small 2, 6 px
   final double sm2 = 6;
 
+  /// compact component padding, 10 px
+  final double sm3 = 10;
+
   // small, 8 px
   final double sm = 8;
 
   // medium, 12 px
   final double md = 12;
+
+  /// medium plus, 14 px
+  final double md2 = 14;
 
   // large, 16 px
   final double lg = 16;
@@ -56,8 +62,14 @@ class AppSpacing {
   /// large 2, 20 px
   final double lg2 = 20;
 
+  /// large plus, 18 px
+  final double lg3 = 18;
+
   // extra large, 24 px
   final double xl = 24;
+
+  /// extra large plus, 28 px
+  final double xl2 = 28;
 
   // extra extra large, 32 px
   final double xxl = 32;
@@ -82,6 +94,9 @@ class AppRadius {
   /// extra small, 4 px
   final double xs = 4;
 
+  /// between extra small and small, 6 px
+  final double xs2 = 6;
+
   /// small, 8 px
   final double sm = 8;
 
@@ -103,6 +118,26 @@ class AppRadius {
 // Icon, IconButton, SizedBox for buttons, CircleAvatar, Container sizes etc.
 class AppSizes {
   const AppSizes();
+
+  /// Desktop navigation rail width and shared top bar height.
+  final double sidebarWidth = 256;
+  final double headerHeight = 64;
+  final double dropdownMaxHeight = 250;
+  final double contentMaxWidth = 1200;
+  final double authCardMaxWidth = 440;
+  final double dialogMaxWidth = 440;
+  final double vehicleFormMaxWidth = 880;
+  final double filterInputWidth = 190;
+  final double compactControlHeight = 42;
+  final double paginationButtonSize = 32;
+  final double paginationIndicatorSize = 28;
+  final double focusStrokeWidth = 1.5;
+  final double hairlineWidth = 1;
+  final double iconXs = 14;
+  final double iconSm = 18;
+  final double iconMd = 20;
+  final double iconLg = 28;
+  final double iconBadge = 44;
 
   /// extra small, 16 px
   final double xs = 16;

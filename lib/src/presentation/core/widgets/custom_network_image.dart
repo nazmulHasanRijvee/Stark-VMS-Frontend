@@ -2,11 +2,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../theme/theme.dart';
+
 class CustomNetworkImage extends StatelessWidget {
   final String imageUrl;
-  final double height;
-  final double width;
-  final double radius;
+  final double? height;
+  final double? width;
+  final double? radius;
   final Widget? placeholder;
   final Widget? errorWidget;
   final bool isLoading;
@@ -14,9 +16,9 @@ class CustomNetworkImage extends StatelessWidget {
   const CustomNetworkImage({
     super.key,
     required this.imageUrl,
-    this.height = 40.0,
-    this.width = 40.0,
-    this.radius = 0.0,
+    this.height,
+    this.width,
+    this.radius,
     this.placeholder,
     this.errorWidget,
     this.isLoading = false,
@@ -24,19 +26,23 @@ class CustomNetworkImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final imageHeight = height ?? context.sizes.md2;
+    final imageWidth = width ?? context.sizes.md2;
+    final cornerRadius = radius ?? context.radius.xs;
+
     return ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
+      borderRadius: BorderRadius.circular(cornerRadius),
       child: CachedNetworkImage(
         imageUrl: imageUrl,
-        height: height,
-        width: width,
+        height: imageHeight,
+        width: imageWidth,
         fit: BoxFit.cover,
         imageBuilder: (context, imageProvider) {
           return Container(
-            height: height,
-            width: width,
+            height: imageHeight,
+            width: imageWidth,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(radius),
+              borderRadius: BorderRadius.circular(cornerRadius),
               image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
             ),
           );
@@ -44,31 +50,33 @@ class CustomNetworkImage extends StatelessWidget {
         progressIndicatorBuilder: (context, url, downloadProgress) {
           return placeholder ??
               Container(
-                height: height,
-                width: width,
+                height: imageHeight,
+                width: imageWidth,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(radius),
-                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(cornerRadius),
+                  color: context.color.surfaceSubtle,
                 ),
                 child: Center(
-                  child: CupertinoActivityIndicator(color: Colors.amber[900]),
+                  child: CupertinoActivityIndicator(
+                    color: context.color.warning,
+                  ),
                 ),
               );
         },
         errorWidget: (context, url, error) {
           return errorWidget ??
               Container(
-                height: height,
-                width: width,
-                padding: EdgeInsets.all(8),
+                height: imageHeight,
+                width: imageWidth,
+                padding: EdgeInsets.all(context.spacing.sm),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(radius),
-                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(cornerRadius),
+                  color: context.color.surfaceSubtle,
                 ),
                 child: Center(
                   child: Icon(
                     Icons.image_not_supported,
-                    color: Colors.grey[400],
+                    color: context.color.text.tertiary,
                   ),
                 ),
               );

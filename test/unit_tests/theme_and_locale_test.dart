@@ -6,7 +6,7 @@ import 'package:stark_vms/src/presentation/core/theme/src/theme_extensions/src/c
 void main() {
   group('AppLocalizations', () {
     test('English translations are accurate', () {
-      final locEn = AppLocalizations(const Locale('en'));
+      final locEn = lookupAppLocalizations(const Locale('en'));
       expect(locEn.appName, 'Stark VMS');
       expect(locEn.navDashboard, 'Dashboard');
       expect(locEn.navVehicles, 'Vehicles');
@@ -18,7 +18,7 @@ void main() {
     });
 
     test('Bangla translations are accurate and glyph-safe', () {
-      final locBn = AppLocalizations(const Locale('bn'));
+      final locBn = lookupAppLocalizations(const Locale('bn'));
       expect(locBn.appName, 'স্টার্ক ভিএমএস');
       expect(locBn.navDashboard, 'ড্যাশবোর্ড');
       expect(locBn.navVehicles, 'যানবাহন');

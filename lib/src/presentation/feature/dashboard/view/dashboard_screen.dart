@@ -30,7 +30,9 @@ class DashboardScreen extends ConsumerWidget {
         ),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1200),
+            constraints: BoxConstraints(
+              maxWidth: context.sizes.contentMaxWidth,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -60,7 +62,7 @@ class DashboardScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(context.radius.sm),
                         ),
                       ),
-                      icon: Icon(Icons.add, size: context.sizes.xs + 2),
+                      icon: Icon(Icons.add, size: context.sizes.iconSm),
                       label: Text(
                         context.loc.registerVehicle,
                         style: context.textStyle.labelMedium.copyWith(
@@ -87,7 +89,7 @@ class DashboardScreen extends ConsumerWidget {
                     border: Border.all(color: context.color.border),
                     boxShadow: [
                       BoxShadow(
-                        color: context.color.text.primary.withOpacity(0.04),
+                        color: context.color.text.primary.withValues(alpha: 0.04),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
@@ -104,7 +106,6 @@ class DashboardScreen extends ConsumerWidget {
                             Text(
                               context.loc.recentlyAddedVehicles,
                               style: context.textStyle.headLineSmall.copyWith(
-                                fontSize: 16,
                                 fontWeight: FontWeight.w700,
                                 color: context.color.text.primary,
                               ),
@@ -114,17 +115,19 @@ class DashboardScreen extends ConsumerWidget {
                                 onPressed: () => context.go(Routes.vehicles.path),
                                 child: Text(
                                   context.loc.viewAll,
-                                  style: context.textStyle.labelSmall.copyWith(
+                                  style: context.textStyle.labelLarge.copyWith(
                                     color: context.color.primary,
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 13,
                                   ),
                                 ),
                               ),
                           ],
                         ),
                       ),
-                      Divider(height: 1, color: context.color.border),
+                      Divider(
+                        height: context.sizes.hairlineWidth,
+                        color: context.color.border,
+                      ),
 
                       if (recentVehicles.isEmpty)
                         _buildEmptyState(context)
@@ -284,9 +287,7 @@ class DashboardScreen extends ConsumerWidget {
               child: Text(
                 context.loc.colVehicleNumber.toUpperCase(),
                 style: context.textStyle.labelSmall.copyWith(
-                  fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.6,
                   color: context.color.text.secondary,
                 ),
               ),
@@ -299,9 +300,7 @@ class DashboardScreen extends ConsumerWidget {
               child: Text(
                 '${context.loc.colBrand} & ${context.loc.colModel}'.toUpperCase(),
                 style: context.textStyle.labelSmall.copyWith(
-                  fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.6,
                   color: context.color.text.secondary,
                 ),
               ),
@@ -314,9 +313,7 @@ class DashboardScreen extends ConsumerWidget {
               child: Text(
                 context.loc.colStatus.toUpperCase(),
                 style: context.textStyle.labelSmall.copyWith(
-                  fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.6,
                   color: context.color.text.secondary,
                 ),
               ),
@@ -332,7 +329,7 @@ class DashboardScreen extends ConsumerWidget {
               Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.spacing.lg2,
-                  vertical: context.spacing.md + 2,
+                  vertical: context.spacing.md2,
                 ),
                 child: Text(
                   v.vehicleNumber,
@@ -345,7 +342,7 @@ class DashboardScreen extends ConsumerWidget {
               Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.spacing.lg2,
-                  vertical: context.spacing.md + 2,
+                  vertical: context.spacing.md2,
                 ),
                 child: Text(
                   '${v.brand} ${v.model}',
@@ -375,7 +372,10 @@ class DashboardScreen extends ConsumerWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: recentVehicles.length,
-      separatorBuilder: (_, _) => Divider(height: 1, color: context.color.border),
+      separatorBuilder: (_, _) => Divider(
+        height: context.sizes.hairlineWidth,
+        color: context.color.border,
+      ),
       itemBuilder: (context, index) {
         final v = recentVehicles[index];
         return Padding(
@@ -433,7 +433,7 @@ class DashboardScreen extends ConsumerWidget {
             ),
             child: Icon(
               Icons.no_crash_outlined,
-              size: context.sizes.sm + 4,
+              size: context.sizes.iconLg,
               color: context.color.icon,
             ),
           ),
@@ -441,7 +441,6 @@ class DashboardScreen extends ConsumerWidget {
           Text(
             context.loc.noVehiclesInFleet,
             style: context.textStyle.headLineSmall.copyWith(
-              fontSize: 17,
               fontWeight: FontWeight.w700,
               color: context.color.text.primary,
             ),
@@ -461,8 +460,8 @@ class DashboardScreen extends ConsumerWidget {
               backgroundColor: context.color.primary,
               foregroundColor: context.color.onPrimary,
               padding: EdgeInsets.symmetric(
-                horizontal: context.spacing.lg + 2,
-                vertical: context.spacing.sm2 + 2,
+                horizontal: context.spacing.lg3,
+                vertical: context.spacing.sm,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(context.radius.sm),
@@ -471,9 +470,8 @@ class DashboardScreen extends ConsumerWidget {
             icon: Icon(Icons.add, size: context.sizes.xs),
             label: Text(
               context.loc.registerVehicle,
-              style: context.textStyle.labelSmall.copyWith(
+              style: context.textStyle.labelLarge.copyWith(
                 fontWeight: FontWeight.w600,
-                fontSize: 13,
                 color: context.color.onPrimary,
               ),
             ),

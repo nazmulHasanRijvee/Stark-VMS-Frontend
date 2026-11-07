@@ -69,13 +69,15 @@ class _Primitive {
   // ===========================================================================
 
   /// Stitch: Text field fill light
-  static const Color inputFill = Color(0xFFF8FAFC);
   static const Color inputFillLight = Color(0xFFF8FAFC);
+
+  /// Stitch: Text field fill dark
   static const Color inputFillDark = Color(0xFF0F172A);
 
   /// Stitch: Text field border light
-  static const Color inputBorder = Color(0xFFCBD5E1);
   static const Color inputBorderLight = Color(0xFFCBD5E1);
+
+  /// Stitch: Text field border dark
   static const Color inputBorderDark = Color(0xFF334155);
 
   /// Stitch: Text field focused border

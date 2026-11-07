@@ -156,7 +156,7 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
       filled: true,
       fillColor: context.color.textFieldFillColor,
       contentPadding: EdgeInsets.symmetric(
-        horizontal: context.spacing.md + 2,
+        horizontal: context.spacing.md2,
         vertical: context.spacing.md,
       ),
       errorText: errorText,
@@ -172,7 +172,10 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(context.radius.sm),
-        borderSide: BorderSide(color: context.color.primary, width: 1.5),
+        borderSide: BorderSide(
+          color: context.color.primary,
+          width: context.sizes.focusStrokeWidth,
+        ),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(context.radius.sm),
@@ -180,7 +183,10 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(context.radius.sm),
-        borderSide: BorderSide(color: context.color.error, width: 1.5),
+        borderSide: BorderSide(
+          color: context.color.error,
+          width: context.sizes.focusStrokeWidth,
+        ),
       ),
     );
   }
@@ -198,7 +204,9 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
         ),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 880),
+            constraints: BoxConstraints(
+              maxWidth: context.sizes.vehicleFormMaxWidth,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -211,7 +219,7 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
                         color: context.color.text.primary,
                       ),
                       onPressed: () => context.go(Routes.vehicles.path),
-                      tooltip: 'Back to Vehicles',
+                      tooltip: context.loc.backToVehicles,
                     ),
                     SizedBox(width: context.spacing.sm),
                     Expanded(
@@ -256,7 +264,7 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
                     border: Border.all(color: context.color.border),
                     boxShadow: [
                       BoxShadow(
-                        color: context.color.text.primary.withOpacity(0.04),
+                        color: context.color.text.primary.withValues(alpha: 0.04),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
@@ -275,7 +283,10 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
 
                         SizedBox(height: context.spacing.xxl),
 
-                        Divider(height: 1, color: context.color.border),
+                        Divider(
+                          height: context.sizes.hairlineWidth,
+                          color: context.color.border,
+                        ),
 
                         SizedBox(height: context.spacing.lg),
 
@@ -574,8 +585,8 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
         ),
         SizedBox(height: context.spacing.sm2),
         Container(
-          height: 48,
-          padding: EdgeInsets.symmetric(horizontal: context.spacing.md + 2),
+          height: context.sizes.lg,
+          padding: EdgeInsets.symmetric(horizontal: context.spacing.md2),
           decoration: BoxDecoration(
             color: context.color.textFieldFillColor,
             borderRadius: BorderRadius.circular(context.radius.sm),
@@ -589,7 +600,7 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
               icon: Icon(
                 Icons.expand_more,
                 color: context.color.icon,
-                size: context.sizes.xs + 2,
+                size: context.sizes.iconSm,
               ),
               style: context.textStyle.bodyMedium.copyWith(
                 fontWeight: FontWeight.w500,

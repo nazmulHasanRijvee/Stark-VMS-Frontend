@@ -35,7 +35,7 @@ class ThemeModeButton extends ConsumerWidget {
           ),
           child: Icon(
             isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-            size: context.sizes.xs + 2, // 18px
+            size: context.sizes.iconSm, // 18px
             color: context.color.icon,
           ),
         ),

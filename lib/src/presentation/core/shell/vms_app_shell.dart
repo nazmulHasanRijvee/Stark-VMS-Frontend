@@ -53,7 +53,7 @@ class VmsAppShell extends ConsumerWidget {
         children: [
           if (isDesktop)
             SizedBox(
-              width: 240,
+              width: context.sizes.sidebarWidth,
               child: ColoredBox(
                 color: context.color.sidebarBackground,
                 child: SafeArea(
@@ -88,12 +88,12 @@ class VmsAppShell extends ConsumerWidget {
       children: [
         // Brand Header
         Container(
-          height: context.sizes.xl,
+          height: context.sizes.headerHeight,
           padding: EdgeInsets.symmetric(horizontal: context.spacing.lg2),
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
-                color: Colors.white.withOpacity(0.1),
+                color: context.color.sidebarBorder,
               ),
             ),
           ),
@@ -109,7 +109,7 @@ class VmsAppShell extends ConsumerWidget {
                 child: Icon(
                   Icons.local_shipping,
                   color: context.color.onPrimary,
-                  size: context.sizes.xs + 2,
+                  size: context.sizes.iconSm,
                 ),
               ),
               SizedBox(width: context.spacing.md),
@@ -118,7 +118,7 @@ class VmsAppShell extends ConsumerWidget {
                 style: context.textStyle.headLineSmall.copyWith(
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.5,
-                  color: Colors.white,
+                  color: context.color.onPrimary,
                 ),
               ),
             ],
@@ -159,7 +159,7 @@ class VmsAppShell extends ConsumerWidget {
         const Spacer(),
 
         // Bottom Logout Item
-        Divider(color: Colors.white.withOpacity(0.1), height: 1),
+        Divider(color: context.color.sidebarBorder, height: context.spacing.xxxs),
         Padding(
           padding: EdgeInsets.all(context.spacing.md),
           child: InkWell(
@@ -168,20 +168,20 @@ class VmsAppShell extends ConsumerWidget {
             child: Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: context.spacing.md,
-                vertical: context.spacing.sm + 2,
+                vertical: context.spacing.sm3,
               ),
               child: Row(
                 children: [
                   Icon(
                     Icons.logout_rounded,
-                    color: const Color(0xFF94A3B8),
-                    size: context.sizes.xs + 2,
+                    color: context.color.text.tertiary,
+                    size: context.sizes.iconSm,
                   ),
                   SizedBox(width: context.spacing.md),
                   Text(
                     context.loc.signOut,
                     style: context.textStyle.bodyMedium.copyWith(
-                      color: const Color(0xFF94A3B8),
+                      color: context.color.text.tertiary,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -206,26 +206,26 @@ class VmsAppShell extends ConsumerWidget {
       borderRadius: BorderRadius.circular(context.radius.sm),
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: context.spacing.md + 2,
-          vertical: context.spacing.sm + 2,
+          horizontal: context.spacing.md2,
+          vertical: context.spacing.sm3,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? context.color.primary : Colors.transparent,
+          color: isSelected ? context.color.primary : context.color.sidebarBackground,
           borderRadius: BorderRadius.circular(context.radius.sm),
         ),
         child: Row(
           children: [
             Icon(
               icon,
-              size: context.sizes.xs + 4,
-              color: isSelected ? context.color.onPrimary : const Color(0xFF94A3B8),
+              size: context.sizes.iconMd,
+              color: isSelected ? context.color.onPrimary : context.color.text.tertiary,
             ),
             SizedBox(width: context.spacing.md),
             Text(
               label,
               style: context.textStyle.bodyMedium.copyWith(
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? context.color.onPrimary : const Color(0xFFCBD5E1),
+                color: isSelected ? context.color.onPrimary : context.color.text.secondary,
               ),
             ),
           ],
@@ -240,8 +240,18 @@ class VmsAppShell extends ConsumerWidget {
     bool isDesktop,
     MockAuthState authState,
   ) {
+    final displayName = authState.userName.trim().isNotEmpty
+        ? authState.userName.trim()
+        : context.loc.defaultUserName;
+    final initials = displayName
+        .split(RegExp(r'\s+'))
+        .where((part) => part.isNotEmpty)
+        .take(2)
+        .map((part) => part[0].toUpperCase())
+        .join();
+
     return Container(
-      height: context.sizes.xl,
+      height: context.sizes.headerHeight,
       padding: EdgeInsets.symmetric(horizontal: context.spacing.xl),
       decoration: BoxDecoration(
         color: context.color.surface,
@@ -250,7 +260,7 @@ class VmsAppShell extends ConsumerWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: context.color.text.primary.withOpacity(0.04),
+            color: context.color.text.primary.withValues(alpha: 0.04),
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),
@@ -263,7 +273,7 @@ class VmsAppShell extends ConsumerWidget {
               builder: (innerContext) => IconButton(
                 icon: Icon(Icons.menu, color: context.color.text.primary),
                 onPressed: () => Scaffold.of(innerContext).openDrawer(),
-                tooltip: 'Open Navigation',
+                tooltip: context.loc.openNavigation,
               ),
             ),
             SizedBox(width: context.spacing.sm),
@@ -285,8 +295,8 @@ class VmsAppShell extends ConsumerWidget {
           const ThemeModeButton(),
           SizedBox(width: context.spacing.md),
           Container(
-            height: context.sizes.xs + 4,
-            width: 1,
+            height: context.sizes.iconMd,
+            width: context.spacing.xxxs,
             color: context.color.border,
           ),
           SizedBox(width: context.spacing.md),
@@ -304,7 +314,7 @@ class VmsAppShell extends ConsumerWidget {
                 ),
                 child: Center(
                   child: Text(
-                    'JD',
+                    initials,
                     style: context.textStyle.labelSmall.copyWith(
                       fontWeight: FontWeight.w700,
                       color: context.color.primary,
@@ -315,9 +325,7 @@ class VmsAppShell extends ConsumerWidget {
               if (isDesktop) ...[
                 SizedBox(width: context.spacing.sm),
                 Text(
-                  authState.userName.isNotEmpty
-                      ? authState.userName
-                      : 'John Doe',
+                  displayName,
                   style: context.textStyle.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                     color: context.color.text.primary,
@@ -332,7 +340,7 @@ class VmsAppShell extends ConsumerWidget {
           // Log Out button
           InkWell(
             onTap: () => _handleLogout(context, ref),
-            borderRadius: BorderRadius.circular(context.radius.xs + 2),
+            borderRadius: BorderRadius.circular(context.radius.xs2),
             child: Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: context.spacing.sm,

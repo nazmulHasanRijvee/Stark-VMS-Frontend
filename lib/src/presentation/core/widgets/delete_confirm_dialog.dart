@@ -35,7 +35,7 @@ class DeleteConfirmDialog extends StatelessWidget {
       elevation: 16,
       insetPadding: EdgeInsets.all(context.spacing.xl),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 440),
+        constraints: BoxConstraints(maxWidth: context.sizes.dialogMaxWidth),
         child: Padding(
           padding: EdgeInsets.all(context.spacing.xl),
           child: Column(
@@ -46,8 +46,8 @@ class DeleteConfirmDialog extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    width: context.sizes.lg - 4, // 44px
-                    height: context.sizes.lg - 4,
+                    width: context.sizes.iconBadge, // 44px
+                    height: context.sizes.iconBadge,
                     decoration: BoxDecoration(
                       color: context.color.errorBg,
                       borderRadius: BorderRadius.circular(context.radius.md),
@@ -128,7 +128,7 @@ class DeleteConfirmDialog extends StatelessWidget {
                         borderRadius: BorderRadius.circular(context.radius.sm),
                       ),
                     ),
-                    icon: Icon(Icons.delete_outline, size: context.sizes.xs + 2),
+                    icon: Icon(Icons.delete_outline, size: context.sizes.iconSm),
                     label: Text(
                       context.loc.delete,
                       style: context.textStyle.labelMedium.copyWith(
