@@ -171,12 +171,16 @@ void main() {
 
       await tokenManager.saveTokens(access: 'token_to_clear');
       await cacheService.save(CacheKey.isLoggedIn, true);
+      await cacheService.save(CacheKey.themeMode, 'dark');
+      await cacheService.save(CacheKey.language, 'bn');
 
       final loggedOut = await authRepo.logout();
       expect(loggedOut, isTrue);
       expect(await tokenManager.accessToken, isNull);
       expect(tokenManager.hasSession, isFalse);
       expect(cacheService.get<bool>(CacheKey.isLoggedIn), isNull);
+      expect(cacheService.get<String>(CacheKey.themeMode), isNull);
+      expect(cacheService.get<String>(CacheKey.language), isNull);
 
       tokenManager.dispose();
     });

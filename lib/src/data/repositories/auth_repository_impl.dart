@@ -131,6 +131,8 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       CacheKey.isLoggedIn,
       CacheKey.rememberMe,
       CacheKey.user,
+      CacheKey.themeMode,
+      CacheKey.language,
     ]);
     await tokens.clearSession();
     return true;

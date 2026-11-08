@@ -17,6 +17,11 @@ class LocaleRepositoryImpl implements LocaleRepository {
   Future<String> getLanguage() async {
     return local.get<String>(CacheKey.language) ?? 'en';
   }
+
+  @override
+  Future<void> clearLanguage() async {
+    await local.remove([CacheKey.language]);
+  }
 }
 
 final localeRepositoryProvider = Provider<LocaleRepository>((ref) {

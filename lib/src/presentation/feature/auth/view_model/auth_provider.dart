@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../data/repositories/auth_repository_impl.dart';
 import '../../../../data/repositories/router_repository_impl.dart';
 import '../../../../domain/repositories/auth_repository.dart';
+import '../../../core/application_state/localization_provider/localization_provider.dart';
+import '../../../core/application_state/theme_mode_provider/theme_mode_provider.dart';
 
 /// State representation for authentication in Stark VMS.
 @immutable
@@ -124,6 +126,8 @@ class AuthNotifier extends Notifier<AuthState> {
         errorMessage: null,
         isLoading: false,
       );
+      await ref.read(themeModeProvider.notifier).persistCurrentTheme();
+      await ref.read(localizationProvider.notifier).persistCurrentLocale();
       return true;
     } else {
       state = state.copyWith(
@@ -183,6 +187,8 @@ class AuthNotifier extends Notifier<AuthState> {
           errorMessage: null,
           isLoading: false,
         );
+        await ref.read(themeModeProvider.notifier).persistCurrentTheme();
+        await ref.read(localizationProvider.notifier).persistCurrentLocale();
         return true;
       }
       state = state.copyWith(isLoading: false, errorMessage: null);
@@ -200,6 +206,8 @@ class AuthNotifier extends Notifier<AuthState> {
   Future<void> logout() async {
     state = state.copyWith(isLoading: true);
     await _repository.logout();
+    await ref.read(themeModeProvider.notifier).clearTheme();
+    await ref.read(localizationProvider.notifier).clearLocale();
     state = AuthState.initial();
   }
 }

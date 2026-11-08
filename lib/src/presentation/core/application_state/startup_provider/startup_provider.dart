@@ -9,9 +9,14 @@ import '../theme_mode_provider/theme_mode_provider.dart';
 /// Restores the remember-me session policy and loads the persisted locale and
 /// theme before the first route is selected.
 final startupProvider = FutureProvider<void>((ref) async {
-  await ref.read(authRepositoryProvider).restoreSession();
-  await ref.read(localizationProvider.notifier).setCurrentLocale();
-  await ref.read(themeModeProvider.notifier).setCurrentThemeMode();
+  final hasSession = await ref.read(authRepositoryProvider).restoreSession();
+  if (hasSession) {
+    await ref.read(localizationProvider.notifier).setCurrentLocale();
+    await ref.read(themeModeProvider.notifier).setCurrentThemeMode();
+  } else {
+    await ref.read(localizationProvider.notifier).clearLocale();
+    await ref.read(themeModeProvider.notifier).clearTheme();
+  }
 });
 
 /// [startupProvider] is eagerly initialized by go_router's redirect logic
