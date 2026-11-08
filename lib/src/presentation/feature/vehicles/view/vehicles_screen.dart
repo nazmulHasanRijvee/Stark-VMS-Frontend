@@ -84,11 +84,16 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
     );
 
     if (confirmed == true && mounted) {
-      ref.read(vehiclesProvider.notifier).deleteVehicle(vehicle.vehicleNumber);
-      CustomToast.showSuccess(
-        context,
-        title: context.loc.vehicleDeletedSuccess,
-      );
+      final successLoc = context.loc.vehicleDeletedSuccess;
+      await ref
+          .read(vehiclesProvider.notifier)
+          .deleteVehicle(vehicle.vehicleNumber);
+      if (mounted) {
+        CustomToast.showSuccess(
+          context,
+          title: successLoc,
+        );
+      }
     }
   }
 

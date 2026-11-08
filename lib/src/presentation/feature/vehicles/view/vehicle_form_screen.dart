@@ -104,7 +104,7 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
     }
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     if (_duplicateError != null) return;
@@ -118,11 +118,16 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
       status: _selectedStatus,
     );
 
+    final duplicateLoc = context.loc.duplicateVehicleNumber;
+    final successTitle = widget.mode == VehicleFormMode.register
+        ? context.loc.vehicleRegisteredSuccess
+        : context.loc.vehicleUpdatedSuccess;
+
     String? error;
     if (widget.mode == VehicleFormMode.register) {
-      error = ref.read(vehiclesProvider.notifier).addVehicle(vehicle);
+      error = await ref.read(vehiclesProvider.notifier).addVehicle(vehicle);
     } else {
-      error = ref
+      error = await ref
           .read(vehiclesProvider.notifier)
           .updateVehicle(
             widget.initialVehicleNumber ?? vehicle.vehicleNumber,
@@ -130,15 +135,12 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
           );
     }
 
+    if (!mounted) return;
+
     if (error != null) {
-      setState(() => _duplicateError = context.loc.duplicateVehicleNumber);
+      setState(() => _duplicateError = duplicateLoc);
       return;
     }
-
-    // Capture loc strings before the async gap to avoid stale context.
-    final successTitle = widget.mode == VehicleFormMode.register
-        ? context.loc.vehicleRegisteredSuccess
-        : context.loc.vehicleUpdatedSuccess;
 
     // Defer toast + navigation to next frame to avoid mutating the widget tree
     // (OverlayEntry / Navigator) during a pointer-event dispatch cycle, which

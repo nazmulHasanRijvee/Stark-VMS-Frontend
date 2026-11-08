@@ -115,7 +115,8 @@ class AppLocalizationsBn extends AppLocalizations {
   String get invalidCredentials => 'অবৈধ ইমেইল বা পাসওয়ার্ড';
 
   @override
-  String get demoHint => 'ডেমো ক্রেডেনশিয়াল: admin@stark.com / password123';
+  String get demoHint =>
+      'ডেমো ক্রেডেনশিয়াল: testuser@gmail.com / pass_test123';
 
   @override
   String get createAccountTitle => 'অ্যাকাউন্ট তৈরি করুন';

@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/extensions/riverpod_extensions.dart';
 import '../../feature/auth/login_screen/view/login_screen.dart';
 import '../../feature/auth/signup_screen/view/signup_screen.dart';
-import '../../feature/auth/view_model/mock_auth_provider.dart';
+import '../../feature/auth/view_model/auth_provider.dart';
 import '../../feature/dashboard/view/dashboard_screen.dart';
 import '../../feature/onboarding/view/start_today_screen.dart';
 import '../../feature/splash/splash_screen/view/splash_screen.dart';
@@ -26,7 +26,7 @@ final _rootNavigatorKey = GlobalKey<NavigatorState>(
 );
 
 final routerProvider = Provider<GoRouter>((ref) {
-  final refreshListenable = ref.asListenable(mockAuthProvider);
+  final refreshListenable = ref.asListenable(authProvider);
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
@@ -34,7 +34,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshListenable: refreshListenable,
     initialLocation: Routes.login.path,
     redirect: (context, state) {
-      final auth = ref.read(mockAuthProvider);
+      final auth = ref.read(authProvider);
       return RedirectGate.redirect(
         currentPath: state.uri.path,
         isAuthenticated: auth.isAuthenticated,

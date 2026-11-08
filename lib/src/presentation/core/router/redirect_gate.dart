@@ -4,7 +4,7 @@ import 'routes.dart';
 ///
 /// Has zero dependency on BuildContext or Ref, making it 100% unit-testable.
 abstract final class RedirectGate {
-  /// Evaluates target path against mock authentication status.
+  /// Evaluates target path against authentication status.
   static String? redirect({
     required String currentPath,
     required bool isAuthenticated,

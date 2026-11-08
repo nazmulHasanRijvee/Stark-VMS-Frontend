@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../core/extensions/localization_extension.dart';
-import '../../feature/auth/view_model/mock_auth_provider.dart';
+import '../../feature/auth/view_model/auth_provider.dart';
 import '../theme/theme.dart';
 import '../widgets/language_selector_pill.dart';
 import '../widgets/theme_mode_button.dart';
@@ -29,7 +29,7 @@ class VmsAppShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isDesktop = screenWidth >= 1024;
-    final authState = ref.watch(mockAuthProvider);
+    final authState = ref.watch(authProvider);
 
     return Scaffold(
       backgroundColor: context.color.scaffoldBackground,
@@ -232,7 +232,7 @@ class VmsAppShell extends ConsumerWidget {
   Widget _buildHeader(
     BuildContext context,
     bool isDesktop,
-    MockAuthState authState,
+    AuthState authState,
   ) {
     final displayName = authState.userName.trim().isNotEmpty
         ? authState.userName.trim()
@@ -335,10 +335,10 @@ class VmsAppShell extends ConsumerWidget {
     // Defer state mutation to the next frame to avoid triggering a widget-tree
     // rebuild (and GoRouter redirect) during an active pointer-event dispatch,
     // which causes the mouse_tracker.dart:199 "!_debugDuringDeviceUpdate" assertion.
-    // The router's refreshListenable watches mockAuthProvider, so calling
+    // The router's refreshListenable watches authProvider, so calling
     // logout() is sufficient — no manual context.go() needed.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(mockAuthProvider.notifier).logout();
+      ref.read(authProvider.notifier).logout();
     });
   }
 }

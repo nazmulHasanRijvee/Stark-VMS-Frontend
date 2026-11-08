@@ -2,17 +2,31 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_strings.dart';
-import '../../../../data/mock/mock_vehicle_data.dart';
+import '../../../../data/repositories/vehicles_repository_impl.dart';
+import '../../../../domain/entities/dashboard_stats.dart';
 import '../../../../domain/entities/vehicle.dart';
+import '../../../../domain/repositories/vehicles_repository.dart';
 
-/// Single source of truth for in-memory fleet vehicle records.
+export '../../../../domain/entities/dashboard_stats.dart';
+
+/// Single source of truth for fleet vehicle records backed by the REST API.
 ///
 /// Modifying this state (create, edit, delete) automatically and reactively
 /// updates both the Vehicles List screen and the Dashboard summary KPI cards.
 class VehiclesNotifier extends Notifier<List<Vehicle>> {
+  late final VehiclesRepository _repository;
+
   @override
   List<Vehicle> build() {
-    return List<Vehicle>.from(MockVehicleData.initialFleet);
+    _repository = ref.watch(vehiclesRepositoryProvider);
+    Future.microtask(() => fetchVehicles());
+    return const [];
+  }
+
+  /// Fetch vehicles from the backend API.
+  Future<void> fetchVehicles() async {
+    final vehicles = await _repository.getVehicles();
+    state = vehicles;
   }
 
   /// Check whether a vehicle number already exists (case-insensitive).
@@ -44,8 +58,8 @@ class VehiclesNotifier extends Notifier<List<Vehicle>> {
   }
 
   /// Add a new vehicle with duplicate-number validation.
-  /// Returns null on success, or an error message string on duplicate failure.
-  String? addVehicle(Vehicle vehicle) {
+  /// Returns null on success, or an error message string on failure.
+  Future<String?> addVehicle(Vehicle vehicle) async {
     if (isDuplicate(vehicle.vehicleNumber)) {
       return AppStrings.duplicateVehicleError;
     }
@@ -53,13 +67,22 @@ class VehiclesNotifier extends Notifier<List<Vehicle>> {
     final normalized = vehicle.copyWith(
       vehicleNumber: vehicle.vehicleNumber.trim().toUpperCase(),
     );
-    state = [normalized, ...state];
+
+    final created = await _repository.createVehicle(normalized);
+    if (created == null) {
+      return _repository.lastError ?? AppStrings.duplicateVehicleError;
+    }
+
+    state = [created, ...state];
     return null;
   }
 
   /// Update an existing vehicle with duplicate-number validation.
   /// Returns null on success, or an error message string on failure.
-  String? updateVehicle(String originalVehicleNumber, Vehicle updated) {
+  Future<String?> updateVehicle(
+    String originalVehicleNumber,
+    Vehicle updated,
+  ) async {
     if (isDuplicate(
       updated.vehicleNumber,
       excludeVehicleNumber: originalVehicleNumber,
@@ -68,10 +91,16 @@ class VehiclesNotifier extends Notifier<List<Vehicle>> {
     }
 
     final normalizedOriginal = originalVehicleNumber.trim().toUpperCase();
+    final result = await _repository.updateVehicle(normalizedOriginal, updated);
+
+    if (result == null) {
+      return _repository.lastError ?? 'Failed to update vehicle.';
+    }
+
     state = [
       for (final v in state)
         if (v.vehicleNumber.trim().toUpperCase() == normalizedOriginal)
-          updated
+          result
         else
           v,
     ];
@@ -79,11 +108,17 @@ class VehiclesNotifier extends Notifier<List<Vehicle>> {
   }
 
   /// Delete a vehicle by its vehicle number.
-  void deleteVehicle(String vehicleNumber) {
+  Future<bool> deleteVehicle(String vehicleNumber) async {
     final normalized = vehicleNumber.trim().toUpperCase();
-    state = state
-        .where((v) => v.vehicleNumber.trim().toUpperCase() != normalized)
-        .toList();
+    final success = await _repository.deleteVehicle(normalized);
+
+    if (success) {
+      state = state
+          .where((v) => v.vehicleNumber.trim().toUpperCase() != normalized)
+          .toList();
+      return true;
+    }
+    return false;
   }
 }
 
@@ -120,7 +155,7 @@ class VehicleFilterNotifier extends Notifier<VehicleFilterState> {
   VehicleFilterState build() => const VehicleFilterState();
 
   void setSearch(String query) {
-    state = state.copyWith(searchQuery: query);
+    state = state.copyWith(searchQuery: query.trim());
   }
 
   void setStatus(String status) {
@@ -137,28 +172,29 @@ final vehicleFilterProvider =
       VehicleFilterNotifier.new,
     );
 
-/// Derived list of vehicles matching current search query and status filter.
+/// Filtered list of fleet vehicles reacting to search text and status dropdown.
 final filteredVehiclesProvider = Provider<List<Vehicle>>((ref) {
   final vehicles = ref.watch(vehiclesProvider);
   final filter = ref.watch(vehicleFilterProvider);
 
-  final query = filter.searchQuery.trim().toLowerCase();
-  final status = filter.statusFilter;
-
   return vehicles.where((v) {
+    final matchesStatus =
+        filter.statusFilter == VehicleFilterState.allStatuses ||
+        v.status == filter.statusFilter;
+
+    if (!matchesStatus) return false;
+
+    if (filter.searchQuery.isEmpty) return true;
+
+    final query = filter.searchQuery.toLowerCase();
     final matchesQuery =
-        query.isEmpty ||
         v.vehicleNumber.toLowerCase().contains(query) ||
+        v.company.toLowerCase().contains(query) ||
         v.brand.toLowerCase().contains(query) ||
         v.model.toLowerCase().contains(query) ||
-        v.company.toLowerCase().contains(query) ||
         v.type.toLowerCase().contains(query);
 
-    final matchesStatus =
-        status == VehicleFilterState.allStatuses ||
-        v.status.toLowerCase() == status.toLowerCase();
-
-    return matchesQuery && matchesStatus;
+    return matchesQuery;
   }).toList();
 });
 
@@ -166,51 +202,51 @@ final filteredVehiclesProvider = Provider<List<Vehicle>>((ref) {
 // Dashboard Derived Metrics
 // =============================================================================
 
-@immutable
-class DashboardStats {
-  final int total;
-  final int active;
-  final int inService;
-  final int inactive;
+class DashboardStatsNotifier extends Notifier<DashboardStats> {
+  @override
+  DashboardStats build() {
+    final vehicles = ref.watch(vehiclesProvider);
+    int activeCount = 0;
+    int inServiceCount = 0;
+    int inactiveCount = 0;
 
-  const DashboardStats({
-    required this.total,
-    required this.active,
-    required this.inService,
-    required this.inactive,
-  });
-}
-
-/// Derived counts computed purely from the vehicle state.
-/// Ensures that creating, editing, or deleting a vehicle updates the counts instantly.
-final dashboardStatsProvider = Provider<DashboardStats>((ref) {
-  final vehicles = ref.watch(vehiclesProvider);
-
-  int activeCount = 0;
-  int inServiceCount = 0;
-  int inactiveCount = 0;
-
-  for (final v in vehicles) {
-    switch (v.status) {
-      case Vehicle.statusActive:
-        activeCount++;
-        break;
-      case Vehicle.statusInService:
-        inServiceCount++;
-        break;
-      case Vehicle.statusInactive:
-        inactiveCount++;
-        break;
+    for (final v in vehicles) {
+      switch (v.status) {
+        case Vehicle.statusActive:
+          activeCount++;
+          break;
+        case Vehicle.statusInService:
+          inServiceCount++;
+          break;
+        case Vehicle.statusInactive:
+          inactiveCount++;
+          break;
+      }
     }
+
+    return DashboardStats(
+      total: vehicles.length,
+      active: activeCount,
+      inService: inServiceCount,
+      inactive: inactiveCount,
+    );
   }
 
-  return DashboardStats(
-    total: vehicles.length,
-    active: activeCount,
-    inService: inServiceCount,
-    inactive: inactiveCount,
-  );
-});
+  Future<void> refresh() async {
+    try {
+      final repo = ref.read(vehiclesRepositoryProvider);
+      final stats = await repo.getDashboardStats();
+      if (stats.total > 0) {
+        state = stats;
+      }
+    } catch (_) {}
+  }
+}
+
+final dashboardStatsProvider =
+    NotifierProvider<DashboardStatsNotifier, DashboardStats>(
+      DashboardStatsNotifier.new,
+    );
 
 /// First 4 recent vehicles for the dashboard preview.
 final recentlyAddedVehiclesProvider = Provider<List<Vehicle>>((ref) {

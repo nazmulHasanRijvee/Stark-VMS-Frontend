@@ -7,7 +7,7 @@ import '../../../../core/router/routes.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/language_selector_pill.dart';
 import '../../../../core/widgets/theme_mode_button.dart';
-import '../../view_model/mock_auth_provider.dart';
+import '../../view_model/auth_provider.dart';
 
 /// Desktop-first, responsive Sign Up screen matching the Stitch design.
 ///
@@ -55,7 +55,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       if (!mounted) return;
       _signupQueued = false;
       ref
-          .read(mockAuthProvider.notifier)
+          .read(authProvider.notifier)
           .signUp(
             fullName: fullName,
             email: email,
@@ -119,7 +119,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(mockAuthProvider);
+    final authState = ref.watch(authProvider);
 
     return Scaffold(
       backgroundColor: context.color.scaffoldBackground,
@@ -391,7 +391,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
                     // Submit Button
                     ElevatedButton.icon(
-                      onPressed: _submit,
+                      onPressed: authState.isLoading ? null : _submit,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: context.color.primary,
                         foregroundColor: context.color.onPrimary,
@@ -405,11 +405,20 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                           ),
                         ),
                       ),
-                      icon: Icon(
-                        Icons.person_add_outlined,
-                        size: context.sizes.iconSm,
-                        color: context.color.onPrimary,
-                      ),
+                      icon: authState.isLoading
+                          ? SizedBox(
+                              width: context.sizes.iconSm,
+                              height: context.sizes.iconSm,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: context.color.onPrimary,
+                              ),
+                            )
+                          : Icon(
+                              Icons.person_add_outlined,
+                              size: context.sizes.iconSm,
+                              color: context.color.onPrimary,
+                            ),
                       label: Text(
                         context.loc.createAccountButton,
                         style: context.textStyle.labelMedium.copyWith(

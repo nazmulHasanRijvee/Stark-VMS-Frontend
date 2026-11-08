@@ -311,7 +311,7 @@ abstract class AppLocalizations {
   /// No description provided for @demoHint.
   ///
   /// In en, this message translates to:
-  /// **'Demo credentials: admin@stark.com / password123'**
+  /// **'Demo credentials: testuser@gmail.com / pass_test123'**
   String get demoHint;
 
   /// No description provided for @createAccountTitle.

@@ -46,6 +46,9 @@ class InMemoryCacheService implements CacheService {
 
 class FakeRestClient implements RestClient {
   @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+
+  @override
   Future<HttpResponse<dynamic>> login(Map<String, dynamic> request) async {
     return HttpResponse({
       'accessToken': 'fake_access_token_123',

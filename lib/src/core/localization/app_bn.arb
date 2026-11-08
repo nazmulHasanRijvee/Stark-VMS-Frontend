@@ -35,7 +35,7 @@
   "dontHaveAccount": "অ্যাকাউন্ট নেই?",
   "signUpLink": "নিবন্ধন করুন",
   "invalidCredentials": "অবৈধ ইমেইল বা পাসওয়ার্ড",
-  "demoHint": "ডেমো ক্রেডেনশিয়াল: admin@stark.com / password123",
+  "demoHint": "ডেমো ক্রেডেনশিয়াল: testuser@gmail.com / pass_test123",
   "createAccountTitle": "অ্যাকাউন্ট তৈরি করুন",
   "createAccountSubtitle": "স্টার্ক ভিএমএস ব্যবহারের জন্য তথ্য দিন",
   "fullName": "পুরো নাম",

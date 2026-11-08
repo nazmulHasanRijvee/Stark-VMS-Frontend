@@ -7,7 +7,7 @@ import '../../../../core/router/routes.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/widgets/language_selector_pill.dart';
 import '../../../../core/widgets/theme_mode_button.dart';
-import '../../view_model/mock_auth_provider.dart';
+import '../../view_model/auth_provider.dart';
 
 /// Desktop-first, responsive Login screen for Stark VMS matching the Stitch design.
 ///
@@ -22,8 +22,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(text: 'admin@stark.com');
-  final _passwordController = TextEditingController(text: 'password123');
+  final _emailController = TextEditingController(text: 'testuser@gmail.com');
+  final _passwordController = TextEditingController(text: 'pass_test123');
   bool _obscurePassword = true;
   bool _loginQueued = false;
 
@@ -46,9 +46,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _loginQueued = false;
-      ref
-          .read(mockAuthProvider.notifier)
-          .login(email: email, password: password);
+      ref.read(authProvider.notifier).login(email: email, password: password);
     });
   }
 
@@ -106,7 +104,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(mockAuthProvider);
+    final authState = ref.watch(authProvider);
 
     return Scaffold(
       backgroundColor: context.color.scaffoldBackground,
@@ -296,7 +294,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                     // Log in Action Button
                     ElevatedButton.icon(
-                      onPressed: _submit,
+                      onPressed: authState.isLoading ? null : _submit,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: context.color.primary,
                         foregroundColor: context.color.onPrimary,
@@ -310,11 +308,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ),
                       ),
-                      icon: Icon(
-                        Icons.login,
-                        size: context.sizes.iconSm,
-                        color: context.color.onPrimary,
-                      ),
+                      icon: authState.isLoading
+                          ? SizedBox(
+                              width: context.sizes.iconSm,
+                              height: context.sizes.iconSm,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: context.color.onPrimary,
+                              ),
+                            )
+                          : Icon(
+                              Icons.login,
+                              size: context.sizes.iconSm,
+                              color: context.color.onPrimary,
+                            ),
                       label: Text(
                         context.loc.logInButton,
                         style: context.textStyle.labelMedium.copyWith(

@@ -115,7 +115,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invalidCredentials => 'Invalid email or password';
 
   @override
-  String get demoHint => 'Demo credentials: admin@stark.com / password123';
+  String get demoHint => 'Demo credentials: testuser@gmail.com / pass_test123';
 
   @override
   String get createAccountTitle => 'Create an Account';

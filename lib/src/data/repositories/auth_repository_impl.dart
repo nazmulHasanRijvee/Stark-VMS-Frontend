@@ -17,6 +17,11 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   final CacheService local;
   final TokenManager tokens;
 
+  String? _lastError;
+
+  @override
+  String? get lastError => _lastError;
+
   @override
   Future<bool> login({
     required String username,
@@ -24,11 +29,28 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     bool shouldRemember = true,
   }) async {
     bool loggedIn = false;
+    _lastError = null;
 
     await Api.call(
       action: remote.login({'username': username, 'password': password}),
-      onSuccess: (data) async {
-        await tokens.saveTokens(access: data['accessToken'] as String);
+      onSuccess: (response) async {
+        final dataMap = response is Map<String, dynamic>
+            ? response
+            : <String, dynamic>{};
+        final innerData = dataMap['data'] is Map<String, dynamic>
+            ? dataMap['data'] as Map<String, dynamic>
+            : dataMap;
+
+        final accessToken = innerData['accessToken'] as String?;
+        if (accessToken != null && accessToken.isNotEmpty) {
+          await tokens.saveTokens(access: accessToken);
+        }
+
+        // Cache user info if present
+        final user = innerData['user'] as Map<String, dynamic>?;
+        final fullName = user?['fullName'] as String? ?? 'User';
+        final email = user?['email'] as String? ?? username;
+        await local.save(CacheKey.user, '$fullName|$email');
 
         if (shouldRemember) {
           try {
@@ -41,10 +63,38 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
 
         loggedIn = true;
       },
-      onError: (_) {},
+      onError: (error) {
+        _lastError = error;
+      },
     );
 
     return loggedIn;
+  }
+
+  @override
+  Future<bool> register({
+    required String fullName,
+    required String email,
+    required String password,
+  }) async {
+    bool registered = false;
+    _lastError = null;
+
+    await Api.call(
+      action: remote.register({
+        'fullName': fullName,
+        'email': email,
+        'password': password,
+      }),
+      onSuccess: (response) async {
+        registered = true;
+      },
+      onError: (error) {
+        _lastError = error;
+      },
+    );
+
+    return registered;
   }
 
   Future<void> _saveSession() async {
@@ -77,9 +127,31 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
 
   @override
   Future<bool> logout() async {
-    await local.remove([CacheKey.isLoggedIn, CacheKey.rememberMe]);
+    await local.remove([
+      CacheKey.isLoggedIn,
+      CacheKey.rememberMe,
+      CacheKey.user,
+    ]);
     await tokens.clearSession();
     return true;
+  }
+
+  @override
+  String? getCachedUserName() {
+    final raw = local.get<String>(CacheKey.user);
+    if (raw == null || !raw.contains('|')) return null;
+    final parts = raw.split('|');
+    return parts.first.trim().isNotEmpty ? parts.first.trim() : null;
+  }
+
+  @override
+  String? getCachedUserEmail() {
+    final raw = local.get<String>(CacheKey.user);
+    if (raw == null || !raw.contains('|')) return null;
+    final parts = raw.split('|');
+    return parts.length > 1 && parts[1].trim().isNotEmpty
+        ? parts[1].trim()
+        : null;
   }
 }
 

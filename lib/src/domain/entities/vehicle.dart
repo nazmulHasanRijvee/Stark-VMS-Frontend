@@ -67,11 +67,23 @@ class Vehicle {
     };
   }
 
+  /// Exact JSON payload matching backend API requirements.
+  Map<String, dynamic> toBackendJson() {
+    return {
+      'vehicleNumber': vehicleNumber.trim().toUpperCase(),
+      'companyName': company.trim(),
+      'vehicleType': type.trim(),
+      'brand': brand.trim(),
+      'model': model.trim(),
+      'status': status.trim(),
+    };
+  }
+
   factory Vehicle.fromMap(Map<String, dynamic> map) {
     return Vehicle(
       vehicleNumber: map['vehicleNumber'] as String? ?? '',
-      company: map['company'] as String? ?? '',
-      type: map['type'] as String? ?? '',
+      company: map['companyName'] as String? ?? map['company'] as String? ?? '',
+      type: map['vehicleType'] as String? ?? map['type'] as String? ?? '',
       brand: map['brand'] as String? ?? '',
       model: map['model'] as String? ?? '',
       status: map['status'] as String? ?? statusActive,
