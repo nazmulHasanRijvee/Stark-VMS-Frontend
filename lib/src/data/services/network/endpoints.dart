@@ -1,7 +1,7 @@
 class Endpoints {
   static const base = String.fromEnvironment(
     'BASE_URL',
-    defaultValue: 'http://localhost:8080/api/v1',
+    defaultValue: 'https://stark-vms-backend-yxhg.onrender.com/api/v1',
   );
 
   /// Authentication
