@@ -308,12 +308,6 @@ abstract class AppLocalizations {
   /// **'Invalid email or password'**
   String get invalidCredentials;
 
-  /// No description provided for @demoHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Demo credentials: testuser@gmail.com / pass_test123'**
-  String get demoHint;
-
   /// No description provided for @createAccountTitle.
   ///
   /// In en, this message translates to:

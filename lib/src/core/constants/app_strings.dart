@@ -12,8 +12,6 @@ abstract final class AppStrings {
   static const String navDashboard = 'Dashboard';
   static const String navVehicles = 'Vehicles';
   static const String logOut = 'Log out';
-  static const String demoUser = 'John Doe';
-  static const String demoUserInitials = 'JD';
 
   // Header controls
   static const String langEn = 'EN';
@@ -32,8 +30,6 @@ abstract final class AppStrings {
   static const String logInButton = 'Log in';
   static const String noAccountPrompt = "Don't have an account?";
   static const String createAccountLink = 'Create an account';
-  static const String mockAuthNotice =
-      'Mock Authentication — any valid email & password will sign in';
   static const String emailRequired = 'Please enter an email';
   static const String emailInvalid = 'Please enter a valid email address';
   static const String passwordRequired = 'Please enter your password';

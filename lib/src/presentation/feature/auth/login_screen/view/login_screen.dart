@@ -22,8 +22,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(text: 'testuser@gmail.com');
-  final _passwordController = TextEditingController(text: 'pass_test123');
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _loginQueued = false;
 
@@ -366,24 +366,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ],
                     ),
 
-                    SizedBox(height: context.spacing.lg),
-
-                    // Demo credentials hint
-                    Text(
-                      context.loc.demoHint,
-                      textAlign: TextAlign.center,
-                      style: context.textStyle.bodySmall.copyWith(
-                        fontStyle: FontStyle.italic,
-                        color: context.color.text.tertiary,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }

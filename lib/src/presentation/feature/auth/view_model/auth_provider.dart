@@ -26,8 +26,8 @@ class AuthState {
 
   factory AuthState.initial() => const AuthState(
     isAuthenticated: false,
-    userName: 'Test User',
-    userEmail: 'testuser@gmail.com',
+    userName: '',
+    userEmail: '',
     errorMessage: null,
     isLoading: false,
   );
@@ -66,16 +66,16 @@ class AuthNotifier extends Notifier<AuthState> {
       if (hasSession && !state.isAuthenticated) {
         state = state.copyWith(
           isAuthenticated: true,
-          userName: cachedName ?? 'Test User',
-          userEmail: cachedEmail ?? 'testuser@gmail.com',
+          userName: cachedName ?? '',
+          userEmail: cachedEmail ?? '',
         );
       }
     });
 
     return AuthState(
       isAuthenticated: false,
-      userName: cachedName ?? 'Test User',
-      userEmail: cachedEmail ?? 'testuser@gmail.com',
+      userName: cachedName ?? '',
+      userEmail: cachedEmail ?? '',
       errorMessage: null,
       isLoading: false,
     );
@@ -94,34 +94,17 @@ class AuthNotifier extends Notifier<AuthState> {
 
     state = state.copyWith(isLoading: true, errorMessage: null);
 
-    bool success = await _repository.login(
+    final bool success = await _repository.login(
       username: trimmedEmail,
       password: password,
     );
-
-    // If demo account and not yet seeded in backend DB, auto-register and retry login
-    if (!success &&
-        trimmedEmail == 'testuser@gmail.com' &&
-        password == 'pass_test123') {
-      final regSuccess = await _repository.register(
-        fullName: 'Test User',
-        email: trimmedEmail,
-        password: password,
-      );
-      if (regSuccess) {
-        success = await _repository.login(
-          username: trimmedEmail,
-          password: password,
-        );
-      }
-    }
 
     if (success) {
       final cachedName = _repository.getCachedUserName();
       final cachedEmail = _repository.getCachedUserEmail();
       state = state.copyWith(
         isAuthenticated: true,
-        userName: cachedName ?? 'Test User',
+        userName: cachedName ?? '',
         userEmail: cachedEmail ?? trimmedEmail,
         errorMessage: null,
         isLoading: false,

@@ -35,7 +35,6 @@
   "dontHaveAccount": "Don't have an account?",
   "signUpLink": "Sign Up",
   "invalidCredentials": "Invalid email or password",
-  "demoHint": "Demo credentials: testuser@gmail.com / pass_test123",
   "createAccountTitle": "Create an Account",
   "createAccountSubtitle": "Enter your details to create your Stark VMS account",
   "fullName": "Full Name",
