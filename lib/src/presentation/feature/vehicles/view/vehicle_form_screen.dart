@@ -40,6 +40,7 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
 
   String _selectedStatus = Vehicle.statusActive;
   String? _duplicateError;
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -105,7 +106,7 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
   }
 
   Future<void> _submit() async {
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (_isSubmitting || !(_formKey.currentState?.validate() ?? false)) return;
 
     if (_duplicateError != null) return;
 
@@ -123,22 +124,32 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
         ? context.loc.vehicleRegisteredSuccess
         : context.loc.vehicleUpdatedSuccess;
 
+    setState(() => _isSubmitting = true);
+
     String? error;
-    if (widget.mode == VehicleFormMode.register) {
-      error = await ref.read(vehiclesProvider.notifier).addVehicle(vehicle);
-    } else {
-      error = await ref
-          .read(vehiclesProvider.notifier)
-          .updateVehicle(
-            widget.initialVehicleNumber ?? vehicle.vehicleNumber,
-            vehicle,
-          );
+    try {
+      if (widget.mode == VehicleFormMode.register) {
+        error = await ref.read(vehiclesProvider.notifier).addVehicle(vehicle);
+      } else {
+        error = await ref
+            .read(vehiclesProvider.notifier)
+            .updateVehicle(
+              widget.initialVehicleNumber ?? vehicle.vehicleNumber,
+              vehicle,
+            );
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isSubmitting = false);
+      rethrow;
     }
 
     if (!mounted) return;
 
     if (error != null) {
-      setState(() => _duplicateError = duplicateLoc);
+      setState(() {
+        _duplicateError = duplicateLoc;
+        _isSubmitting = false;
+      });
       return;
     }
 
@@ -332,7 +343,7 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
                             ),
                             SizedBox(width: context.spacing.md),
                             ElevatedButton(
-                              onPressed: _submit,
+                              onPressed: _isSubmitting ? null : _submit,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: context.color.primary,
                                 foregroundColor: context.color.onPrimary,
@@ -347,14 +358,36 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
                                   ),
                                 ),
                               ),
-                              child: Text(
-                                isEdit
-                                    ? context.loc.updateVehicleButton
-                                    : context.loc.saveVehicleButton,
-                                style: context.textStyle.labelMedium.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: context.color.onPrimary,
-                                ),
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Opacity(
+                                    opacity: _isSubmitting ? 0 : 1,
+                                    child: Text(
+                                      isEdit
+                                          ? context.loc.updateVehicleButton
+                                          : context.loc.saveVehicleButton,
+                                      style: context.textStyle.labelMedium
+                                          .copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: context.color.onPrimary,
+                                          ),
+                                    ),
+                                  ),
+                                  if (_isSubmitting)
+                                    Positioned.fill(
+                                      child: Center(
+                                        child: SizedBox(
+                                          width: context.sizes.iconSm,
+                                          height: context.sizes.iconSm,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: context.color.onPrimary,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
                               ),
                             ),
                           ],
