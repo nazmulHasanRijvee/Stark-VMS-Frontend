@@ -1,369 +1,85 @@
-# Stark VMS — Backend Feature Overview & API Contract Specification
-
-> **Target Audience**: Backend Engineers and AI Agents building the Java / Spring Boot backend for Stark VMS.  
-> **Document Purpose**: Definitive technical specification and REST API contract aligning the Spring Boot backend with the Flutter Web frontend. Ensures backend logic, data models, and exposed endpoints strictly match what the frontend supports without scope creep.
-
+---
+title: Stark VMS Frontend Overview
+tags:
+  - stark-vms
+  - flutter
+  - assignment-2
 ---
 
-## 1. System Overview & Architectural Boundaries
+# Stark VMS — Frontend Project Overview
 
-**Stark VMS (Vehicle Management System)** is an enterprise fleet management web application. The frontend is built with Flutter Web following Clean Architecture, Riverpod state management, and GoRouter.
+> Current implementation brief for coding agents working in the Flutter project. Read this before making changes. It updates the original Assignment 1 scope for Assignment 2.
 
-### 1.1 Strict Scope Boundaries (Out-of-Scope)
-To avoid unnecessary complexity and prevent misalignment between frontend and backend, the following features are **strictly out of scope** for this phase:
-- ❌ **No Refresh Token Flow**: The system uses a streamlined **Access-Token-Only** architecture. No refresh token endpoints, storage, or rotation logic.
-- ❌ **No GPS / Telemetry / Real-time Tracking**: No live vehicle coordinates, speed monitoring, or IoT device ingestion.
-- ❌ **No Driver Assignment / Dispatching**: No driver license validation, work-shift dispatches, or trip planning.
-- ❌ **No Maintenance Scheduling / Invoicing / Fuel Logs**: No garage repair orders, parts inventory, or fuel receipts.
-- ❌ **No Background Job Workers / Push Notifications**: All interactions are synchronous REST requests.
+## Product and stack
 
-### 1.2 In-Scope Capabilities
-1. **User Authentication & Authorization**: Registration and Login using JWT (Access-Token-only).
-2. **Dashboard Summary KPI Metrics**: High-level counts of total, active, in-service, and inactive fleet vehicles.
-3. **Vehicle Fleet Management (CRUD)**: List, filter, search, register, view, update, and delete vehicle records with case-insensitive unique registration plate numbers.
+- Product name and visible branding: **Stark VMS**.
+- Frontend: Flutter Web. The existing project uses Riverpod, GoRouter, Dio/Retrofit, and a Clean Architecture structure.
+- Backend: Java Spring Boot REST API with PostgreSQL. The backend owns persistence, authentication, authorization, validation, and business rules.
+- File storage: Supabase Storage is configured for vehicle documents. Flutter must use the backend's documented upload/download API. Do not put Supabase service credentials in the app or call privileged storage APIs directly.
 
----
+## Source of truth and outdated notes
 
-## 2. Recommended Backend Architecture & Tech Stack
+Older Assignment 1 notes and the previous backend-focused feature overview may say that drivers, maintenance, documents, or Assignment 2 are out of scope. Those scope statements are superseded by this overview and the current Assignment 2 requirements.
 
-- **Language & Runtime**: Java 17+ or Java 21 (LTS)
-- **Framework**: Spring Boot 3.x (`spring-boot-starter-web`, `spring-boot-starter-security`, `spring-boot-starter-data-jpa`, `spring-boot-starter-validation`)
-- **Security**: Spring Security 6 with stateless `SessionCreationPolicy.STATELESS` and a custom `JwtAuthenticationFilter`
-- **Password Hashing**: `BCryptPasswordEncoder` (strength 10 or 12)
-- **Database**: PostgreSQL (Production) or H2 / MySQL (Development)
-- **Database Migrations**: Flyway or Liquibase (or Hibernate `ddl-auto: update` for initial development)
-- **API Documentation**: SpringDoc OpenAPI / Swagger UI (optional)
+Keep the useful coding conventions from `AGENTS.md`: architecture, design tokens, Riverpod, routing, Retrofit, and shared widgets. Before implementing network features, inspect the current backend source and its latest API contract. Do not assume endpoints, field names, or the `In Service` status from older documentation are still valid. If frontend code, backend code, and this brief disagree about an API detail, report the exact mismatch and follow the actual backend contract. Do not invent requests or silently use mock data.
 
----
+## Assignment 1 baseline to preserve
 
-## 3. Seed Accounts & Mock Data Requirements
+Assignment 1 established the Stark VMS shell and core vehicle workflow. Preserve and extend the existing implementation rather than re-scaffolding it. First inspect the app to see which items below are already complete:
 
-### 3.1 Coursework / Demo Seed Account
-The backend **must idempotently seed** a default demonstration account on application startup if it does not already exist:
-- **Full Name**: `John Doe`
-- **Email / Username**: `admin@stark.com`
-- **Password**: `password123`
-- **Role**: `ROLE_ADMIN`
-- **Password Storage**: The backend **must store only a BCrypt hash** of `password123`. Plaintext passwords must never be stored in the database, logged, or returned in responses.
-- **Environment Scoping**: This seed account must be scoped to coursework, demo, or development profiles (e.g., `@Profile("!production")` or a configuration flag `app.seed.demo-account=true`) so it can be disabled or removed in production.
-- **Security Notice**: This known, shared credential is strictly for grading, demo presentations, and evaluation. It is unsuitable for real company or enterprise data.
+- Login and sign-up screens. Sign-up does not require email verification for this assignment.
+- JWT **access-token-only** session. There is no refresh-token flow. On an expired or unauthorized session, clear auth state and return the user to login with a clear message.
+- Keep the demo-login path available for instructor evaluation. The demo account is managed by the backend; do not hardcode its password or other secrets in Flutter.
+- Database-backed vehicle list and vehicle create, view, edit, and delete.
+- Duplicate vehicle-number validation, with backend responses displayed clearly.
+- Search, filtering, sorting, and pagination must follow the backend's actual server-side contract where provided.
+- Dashboard and vehicle-list data should come from API-backed state, not pretend production data or stale mock records.
+- Keep the existing responsive Stark VMS visual language and app architecture.
 
-### 3.2 Seed Fleet Vehicles (Initial Data)
-To ensure the dashboard KPI metrics match the frontend prototype upon initial load, the backend must seed the following 4 vehicles idempotently:
+## What changed for Assignment 2
 
-| Vehicle Number (Plate) | Company Name | Vehicle Type | Brand | Model | Status |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `DHAKA METRO GA-12-3456` | Stark Logistics | Sedan | Toyota | Corolla | `Active` |
-| `DHAKA METRO CHA-55-9812` | Stark Agro | Microbus / Van | Nissan | Urvan | `In Service` |
-| `DHAKA METRO BA-11-2233` | Stark Retail | Sedan | Honda | Civic | `Active` |
-| `CHATTOGRAM METRO KHA-22-1100` | Stark Tech | SUV | Mitsubishi | Pajero | `Inactive` |
+Assignment 2 extends the existing VMS. The old three-state vehicle model is replaced: use **Active**, **Inactive**, and **Maintenance** everywhere. Do not show or submit **In Service**. Status changes are explicit; adding a maintenance record must not change a vehicle's status.
 
-**Derived Seed KPI Totals**:
-- Total Vehicles: `4`
-- Active Vehicles: `2`
-- In Service Vehicles: `1`
-- Inactive Vehicles: `1`
+Add these feature areas, matching the latest Stitch design and the actual backend capabilities:
 
----
+1. **Vehicle documents:** upload Registration, Tax Token, Insurance, Fitness Certificate, or Other. Show the latest upload and retain previous uploads in document history when a document is renewed.
+2. **Expiry tracking:** support optional expiry dates and clear Valid, Expiring Soon, Expired, and No Expiry Date states. Expiring Soon means an expiry within the next 30 days. Calculate from the current date; do not hard-code example dates.
+3. **Maintenance history:** view and add dated records with maintenance type, cost, workshop/vendor, and notes. Show history for the selected vehicle.
+4. **Driver management:** driver CRUD with name, phone, license number, license expiry, and Active/Inactive status.
+5. **Driver assignment:** each vehicle has at most one current driver; each driver may be assigned to at most one vehicle at a time. Make inactive or otherwise unavailable drivers ineligible. Provide an assign/change/unassign flow supported by the backend API.
+6. **Vehicle list enhancements:** server-side search (prioritize vehicle number and support other fields exposed by the backend), filtering, sorting, and pagination, with accurate loading, error, and empty states.
+7. **Dashboard:** connect total vehicles, Active vehicles, vehicles in Maintenance, document-expiry attention, and maintenance-this-month statistics to real backend data. Do not calculate fleet totals from only one page of a paginated list.
 
-## 4. REST API Contract & Endpoints
+Keep navigation simple: **Dashboard**, **Vehicles**, and **Drivers** are primary destinations. Documents and Maintenance belong inside Vehicle Details. Settings and user-management screens remain deferred; keep only an existing future Settings placeholder if it is already part of the design. Roles and fine-grained permission management are deferred, while the backend remains responsible for authorization.
 
-All request and response bodies use standard `application/json`.
+## Theme and language
 
-### 4.1 Global Response Standard Envelope
-#### 4.1.1 Success Envelope
-```json
-{
-  "success": true,
-  "message": "Operation completed successfully",
-  "data": { ... }
-}
-```
+- Make the shared theme control work across every page, dialog, form, table, and status indicator in light and dark modes. Persist the preference using the existing app preference pattern.
+- Make English and Bangla switching functional and persistent. Localize all user-facing text, validation and error states, statuses, empty/loading states, dates, and actions. Check Bangla glyph support and text overflow.
+- Keep the same information hierarchy in both themes and languages. Status and expiry meaning must use text as well as color.
 
-#### 4.1.2 Error Envelope
-When an exception or validation error occurs, the API must return:
-```json
-{
-  "success": false,
-  "message": "Detailed error message suitable for frontend display",
-  "timestamp": "2026-11-07T14:30:00Z"
-}
-```
+## Implementation guidance
 
----
+1. Inspect the current Flutter source, `AGENTS.md`, localization/theme setup, API client, and latest backend implementation/API docs. Identify what is already complete before editing.
+2. Preserve existing Assignment 1 screens and flows. Reuse the current architecture, repositories, Riverpod providers, router, theme tokens, localization ARBs, and shared widgets.
+3. Extend Vehicle Details with Overview, Documents, and Maintenance sections. Add Drivers and driver assignment without duplicating actions or creating unnecessary screens.
+4. Implement loading, success, validation, empty, and API-error states for every new workflow. Keep network calls in repositories/services, not widgets.
+5. Use the actual backend API contract for field names, routes, multipart upload shape, pagination, and error mapping. Never ship fake records as if they came from the server.
+6. Keep Supabase credentials and privileged storage operations on the backend. Flutter should call only documented authenticated backend endpoints and use documented download access.
+7. Keep role administration, settings screens, email verification, refresh tokens, dispatch/trips, GPS/telematics, fuel tracking, and maintenance scheduling out of scope.
 
-### 4.2 Authentication Endpoints
+## Acceptance checklist
 
-#### 4.2.1 Register New User
-- **Endpoint**: `POST /auth/register/` (or `/auth/register`)
-- **Authentication**: Public (no token required)
-- **Request Body**:
-```json
-{
-  "fullName": "Jane Doe",
-  "email": "jane@stark.com",
-  "password": "securepassword123"
-}
-```
-- **Validation**:
-  - `fullName`: Required, 2-100 characters.
-  - `email`: Required, valid email format, unique across users.
-  - `password`: Required, minimum 6 characters.
-- **Success Response (201 Created)**:
-```json
-{
-  "success": true,
-  "message": "User registered successfully",
-  "data": {
-    "id": 2,
-    "fullName": "Jane Doe",
-    "email": "jane@stark.com",
-    "role": "ROLE_USER"
-  }
-}
-```
-- **Error Responses**:
-  - `400 Bad Request`: Validation failure (e.g. invalid email format, short password).
-  - `409 Conflict`: Email already registered (`{"success": false, "message": "Email already in use"}`).
+- Existing login, sign-up, demo login, and vehicle CRUD continue to work with backend data and access-token-only authentication.
+- The app uses only Active, Inactive, and Maintenance for vehicle status.
+- Search/filter/sort/pagination and dashboard totals agree with backend response semantics.
+- Documents can be uploaded and viewed with expiry state and prior-version history; no storage secret is present in Flutter.
+- Maintenance records can be created and viewed without automatically changing vehicle status.
+- Drivers can be created, edited, listed, and deleted; assignment rules prevent a driver from being assigned to multiple vehicles at once.
+- Dashboard summaries and document alerts reflect backend data and current dates.
+- Supported screens work in light/dark mode and English/Bangla at desktop and narrow viewport sizes.
+- No duplicate primary actions, clipped tables/forms, unreadable status labels, or unintended duplicate screens are introduced.
 
----
+## Handoff
 
-#### 4.2.2 User Login (Access Token Only)
-- **Endpoint**: `POST /auth/login`
-- **Authentication**: Public (no token required)
-- **Request Body**:
-  > **IMPORTANT**: The request body field is named `username` (which holds the user's email address) to match the Flutter client's `AuthenticationRepositoryImpl` and Retrofit interface:
-```json
-{
-  "username": "admin@stark.com",
-  "password": "password123"
-}
-```
-- **Success Response (200 OK)**:
-  > **Note**: Returns `accessToken` only. Refresh tokens are intentionally omitted.
-```json
-{
-  "success": true,
-  "message": "Login successful",
-  "data": {
-    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBzdGFyay5jb20iLCJyb2xlIjoiUk9MRV9BRE1JTiIsImV4cCI6MTc5Mzk5MDAwMH0.signature",
-    "tokenType": "Bearer",
-    "expiresIn": 86400,
-    "user": {
-      "id": 1,
-      "fullName": "John Doe",
-      "email": "admin@stark.com",
-      "role": "ROLE_ADMIN"
-    }
-  }
-}
-```
-- **Error Responses**:
-  - `401 Unauthorized`: Bad credentials (`{"success": false, "message": "Invalid email or password"}`).
-
----
-
-### 4.3 Dashboard KPI Metrics Endpoint
-
-#### 4.3.1 Get Dashboard Statistics
-- **Endpoint**: `GET /dashboard/stats`
-- **Authentication**: Required (`Bearer <accessToken>`)
-- **Success Response (200 OK)**:
-```json
-{
-  "success": true,
-  "data": {
-    "totalVehicles": 4,
-    "activeVehicles": 2,
-    "inServiceVehicles": 1,
-    "inactiveVehicles": 1
-  }
-}
-```
-
----
-
-### 4.4 Vehicle Fleet Management Endpoints
-
-#### 4.4.1 List & Filter Vehicles
-- **Endpoint**: `GET /vehicles`
-- **Authentication**: Required (`Bearer <accessToken>`)
-- **Query Parameters**:
-  - `search` (optional string): Case-insensitive search matching `vehicleNumber`, `brand`, `model`, or `companyName`.
-  - `status` (optional string): Filter by status: `Active`, `In Service`, `Inactive`, or `All`.
-  - `page` (optional integer, default `0`): Zero-based page number.
-  - `size` (optional integer, default `20`): Page size.
-- **Success Response (200 OK)**:
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "vehicleNumber": "DHAKA METRO GA-12-3456",
-      "companyName": "Stark Logistics",
-      "vehicleType": "Sedan",
-      "brand": "Toyota",
-      "model": "Corolla",
-      "status": "Active"
-    },
-    {
-      "vehicleNumber": "DHAKA METRO CHA-55-9812",
-      "companyName": "Stark Agro",
-      "vehicleType": "Microbus / Van",
-      "brand": "Nissan",
-      "model": "Urvan",
-      "status": "In Service"
-    }
-  ]
-}
-```
-
----
-
-#### 4.4.2 Register Vehicle (Create)
-- **Endpoint**: `POST /vehicles`
-- **Authentication**: Required (`Bearer <accessToken>`)
-- **Request Body**:
-```json
-{
-  "vehicleNumber": "DHAKA METRO HA-99-0001",
-  "companyName": "Stark Logistics",
-  "vehicleType": "Pickup",
-  "brand": "Ford",
-  "model": "Ranger",
-  "status": "Active"
-}
-```
-- **Validation**:
-  - `vehicleNumber`: Required, trimmed, converted to uppercase, unique across all vehicles (case-insensitive).
-  - `companyName`: Required, non-empty.
-  - `vehicleType`: Required (e.g. `Sedan`, `SUV`, `Microbus / Van`, `Pickup`, `Truck`).
-  - `brand`: Required.
-  - `model`: Required.
-  - `status`: Required, one of: `Active`, `In Service`, `Inactive`.
-- **Success Response (201 Created)**:
-```json
-{
-  "success": true,
-  "message": "Vehicle registered successfully",
-  "data": {
-    "vehicleNumber": "DHAKA METRO HA-99-0001",
-    "companyName": "Stark Logistics",
-    "vehicleType": "Pickup",
-    "brand": "Ford",
-    "model": "Ranger",
-    "status": "Active"
-  }
-}
-```
-- **Error Responses**:
-  - `409 Conflict`: When `vehicleNumber` already exists:
-    ```json
-    {
-      "success": false,
-      "message": "A vehicle with this registration number already exists."
-    }
-    ```
-
----
-
-#### 4.4.3 Get Single Vehicle Details
-- **Endpoint**: `GET /vehicles/{vehicleNumber}`
-- **Authentication**: Required (`Bearer <accessToken>`)
-- **Path Variable**: `vehicleNumber` (URL-encoded plate string)
-- **Success Response (200 OK)**:
-```json
-{
-  "success": true,
-  "data": {
-    "vehicleNumber": "DHAKA METRO GA-12-3456",
-    "companyName": "Stark Logistics",
-    "vehicleType": "Sedan",
-    "brand": "Toyota",
-    "model": "Corolla",
-    "status": "Active"
-  }
-}
-```
-- **Error Response**:
-  - `404 Not Found`: If no vehicle matches the given plate number.
-
----
-
-#### 4.4.4 Update Vehicle
-- **Endpoint**: `PUT /vehicles/{vehicleNumber}`
-- **Authentication**: Required (`Bearer <accessToken>`)
-- **Path Variable**: `vehicleNumber` (current plate number)
-- **Request Body**:
-```json
-{
-  "vehicleNumber": "DHAKA METRO GA-12-3456",
-  "companyName": "Stark Prime Fleet",
-  "vehicleType": "Sedan",
-  "brand": "Toyota",
-  "model": "Camry",
-  "status": "In Service"
-}
-```
-- **Validation**:
-  - If `vehicleNumber` is changed in the body, verify the new number is not used by any other vehicle.
-- **Success Response (200 OK)**:
-```json
-{
-  "success": true,
-  "message": "Vehicle updated successfully",
-  "data": {
-    "vehicleNumber": "DHAKA METRO GA-12-3456",
-    "companyName": "Stark Prime Fleet",
-    "vehicleType": "Sedan",
-    "brand": "Toyota",
-    "model": "Camry",
-    "status": "In Service"
-  }
-}
-```
-
----
-
-#### 4.4.5 Delete Vehicle
-- **Endpoint**: `DELETE /vehicles/{vehicleNumber}`
-- **Authentication**: Required (`Bearer <accessToken>`)
-- **Path Variable**: `vehicleNumber`
-- **Success Response (200 OK or 204 No Content)**:
-```json
-{
-  "success": true,
-  "message": "Vehicle deleted successfully"
-}
-```
-- **Error Response**:
-  - `404 Not Found`: If vehicle does not exist.
-
----
-
-## 5. Security & Session Flow Specification
-
-### 5.1 Access Token Rules
-1. **Stateless JWTs**: Access tokens should have a standard lifespan (e.g. 24 hours).
-2. **Authorization Header**: Passed on all protected endpoints as:
-   ```http
-   Authorization: Bearer <accessToken>
-   ```
-3. **No Refresh Token Endpoints**: Refresh token endpoints are deliberately omitted from the API contract.
-4. **401 Unauthorized Handling**:
-   - When an authenticated request returns HTTP `401 Unauthorized`, the Flutter client automatically clears the session and access token, displays a "Session expired. Please log in again." toast notification, and redirects the user to `/login`.
-   - The client will not retry or attempt a background refresh.
-
----
-
-## 6. Frontend to Backend Schema Mapping Reference
-
-| Flutter Entity / Model (`lib/src/domain/entities/vehicle.dart`) | Java Entity Property (`Vehicle.java`) | SQL Column Name | Type / Constraints |
-| :--- | :--- | :--- | :--- |
-| `vehicle.vehicleNumber` | `vehicleNumber` | `vehicle_number` | `VARCHAR(64)` PRIMARY KEY / UNIQUE |
-| `vehicle.company` | `companyName` | `company_name` | `VARCHAR(128)` NOT NULL |
-| `vehicle.type` | `vehicleType` | `vehicle_type` | `VARCHAR(64)` NOT NULL |
-| `vehicle.brand` | `brand` | `brand` | `VARCHAR(64)` NOT NULL |
-| `vehicle.model` | `model` | `model` | `VARCHAR(64)` NOT NULL |
-| `vehicle.status` | `status` | `status` | `VARCHAR(32)` NOT NULL (`Active`, `In Service`, `Inactive`) |
-
+Before implementation, summarize the current state and any backend/API gaps found. After implementation, list the features completed, the API contracts used, any remaining backend prerequisites, and the Flutter checks run with their results. Do not claim an end-to-end feature is complete when its backend endpoint is unavailable.
