@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../core/extensions/localization_extension.dart';
-import '../../../../domain/entities/vehicle.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/status_chip.dart';
@@ -35,7 +35,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final stats = ref.watch(dashboardStatsProvider);
+    final isLoading = ref.watch(dashboardLoadingProvider);
+    final hasStatsError = ref.watch(dashboardStatsErrorProvider);
     final recentVehicles = ref.watch(recentlyAddedVehiclesProvider);
+    final isVehiclesLoading = ref.watch(vehiclesLoadingProvider);
     final screenWidth = MediaQuery.sizeOf(context).width;
 
     return Scaffold(
@@ -95,69 +98,111 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 SizedBox(height: context.spacing.xl),
 
                 // 4 Summary KPI Cards
-                _buildKpiGrid(stats, screenWidth),
+                if (hasStatsError && !isLoading)
+                  _buildDashboardError(context)
+                else
+                  Skeletonizer(
+                    enabled: isLoading,
+                    child: _buildKpiGrid(stats, screenWidth),
+                  ),
+
+                // Document Expiry Attention Banner
+                if (!isLoading &&
+                    !hasStatsError &&
+                    (stats.documentExpiringCount > 0 ||
+                        stats.documentExpiredCount > 0)) ...[
+                  SizedBox(height: context.spacing.lg),
+                  _buildDocumentExpiryBanner(stats),
+                ],
+
+                // Maintenance This Month Card
+                if (!isLoading &&
+                    !hasStatsError &&
+                    (stats.maintenanceThisMonthCount > 0 ||
+                        stats.maintenanceThisMonthCost > 0)) ...[
+                  SizedBox(height: context.spacing.lg),
+                  _buildMaintenanceThisMonthCard(stats),
+                ],
+
+                if (!isLoading &&
+                    !hasStatsError &&
+                    stats.expiringSoon.isNotEmpty) ...[
+                  SizedBox(height: context.spacing.lg),
+                  _buildExpiringDocuments(context, stats),
+                ],
+
+                if (!isLoading &&
+                    !hasStatsError &&
+                    stats.recentMaintenance.isNotEmpty) ...[
+                  SizedBox(height: context.spacing.lg),
+                  _buildRecentMaintenance(context, stats),
+                ],
 
                 SizedBox(height: context.spacing.xl),
 
                 // Recently Added Vehicles Section
-                Container(
-                  decoration: BoxDecoration(
-                    color: context.color.surface,
-                    borderRadius: BorderRadius.circular(context.radius.md),
-                    border: Border.all(color: context.color.border),
-                    boxShadow: [
-                      BoxShadow(
-                        color: context.color.text.primary.withValues(
-                          alpha: 0.04,
+                Skeletonizer(
+                  enabled: isVehiclesLoading,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: context.color.surface,
+                      borderRadius: BorderRadius.circular(context.radius.md),
+                      border: Border.all(color: context.color.border),
+                      boxShadow: [
+                        BoxShadow(
+                          color: context.color.text.primary.withValues(
+                            alpha: 0.04,
+                          ),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
                         ),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(context.spacing.lg),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              context.loc.recentlyAddedVehicles,
-                              style: context.textStyle.headLineSmall.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: context.color.text.primary,
-                              ),
-                            ),
-                            if (recentVehicles.isNotEmpty)
-                              TextButton(
-                                onPressed: () => _openVehicleList(
-                                  VehicleFilterState.allStatuses,
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(context.spacing.lg),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                context.loc.recentlyAddedVehicles,
+                                style: context.textStyle.headLineSmall.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: context.color.text.primary,
                                 ),
-                                child: Text(
-                                  context.loc.viewAll,
-                                  style: context.textStyle.labelLarge.copyWith(
-                                    color: context.color.primary,
-                                    fontWeight: FontWeight.w600,
+                              ),
+                              if (recentVehicles.isNotEmpty)
+                                TextButton(
+                                  onPressed: () => _openVehicleList(
+                                    VehicleFilterState.allStatuses,
+                                  ),
+                                  child: Text(
+                                    context.loc.viewAll,
+                                    style: context.textStyle.labelLarge
+                                        .copyWith(
+                                          color: context.color.primary,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                   ),
                                 ),
-                              ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      Divider(
-                        height: context.sizes.hairlineWidth,
-                        color: context.color.border,
-                      ),
+                        Divider(
+                          height: context.sizes.hairlineWidth,
+                          color: context.color.border,
+                        ),
 
-                      if (recentVehicles.isEmpty)
-                        _buildEmptyState()
-                      else if (screenWidth < 640)
-                        _buildMobileRecentList(recentVehicles)
-                      else
-                        _buildDesktopRecentTable(recentVehicles),
-                    ],
+                        if (recentVehicles.isEmpty && !isVehiclesLoading)
+                          _buildEmptyState()
+                        else if (screenWidth < 640)
+                          _buildMobileRecentList(recentVehicles)
+                        else
+                          _buildDesktopRecentTable(recentVehicles),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -167,6 +212,288 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
     );
   }
+
+  Widget _buildDocumentExpiryBanner(DashboardStats stats) {
+    final hasExpired = stats.documentExpiredCount > 0;
+    final bannerColor = hasExpired
+        ? context.color.error.withValues(alpha: 0.1)
+        : context.color.warning.withValues(alpha: 0.1);
+    final borderColor = hasExpired
+        ? context.color.error
+        : context.color.warning;
+    final iconColor = hasExpired ? context.color.error : context.color.warning;
+
+    final lines = <String>[];
+    if (stats.documentExpiredCount > 0) {
+      lines.add(
+        context.loc.documentExpiryAlertExpired(stats.documentExpiredCount),
+      );
+    }
+    if (stats.documentExpiringCount > 0) {
+      lines.add(
+        context.loc.documentExpiryAlertExpiring(stats.documentExpiringCount),
+      );
+    }
+
+    return Container(
+      padding: EdgeInsets.all(context.spacing.lg),
+      decoration: BoxDecoration(
+        color: bannerColor,
+        borderRadius: BorderRadius.circular(context.radius.md),
+        border: Border.all(color: borderColor.withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            hasExpired ? Icons.error_outline : Icons.warning_amber_outlined,
+            color: iconColor,
+            size: context.sizes.iconMd,
+          ),
+          SizedBox(width: context.spacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.loc.documentExpiryAlertTitle,
+                  style: context.textStyle.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: context.color.text.primary,
+                  ),
+                ),
+                ...lines.map(
+                  (l) => Text(
+                    l,
+                    style: context.textStyle.bodySmall.copyWith(
+                      color: context.color.text.secondary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: () => _navigateTo(Routes.vehicles.path),
+            child: Text(
+              context.loc.viewAll,
+              style: context.textStyle.labelMedium.copyWith(
+                color: iconColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMaintenanceThisMonthCard(DashboardStats stats) {
+    return Container(
+      padding: EdgeInsets.all(context.spacing.lg),
+      decoration: BoxDecoration(
+        color: context.color.surface,
+        borderRadius: BorderRadius.circular(context.radius.md),
+        border: Border.all(color: context.color.border),
+        boxShadow: [
+          BoxShadow(
+            color: context.color.text.primary.withValues(alpha: 0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(context.spacing.md),
+            decoration: BoxDecoration(
+              color: context.color.statusMaintenanceBg,
+              borderRadius: BorderRadius.circular(context.radius.sm),
+            ),
+            child: Icon(
+              Icons.build_outlined,
+              color: context.color.statusMaintenanceFg,
+              size: context.sizes.iconMd,
+            ),
+          ),
+          SizedBox(width: context.spacing.lg),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.loc.maintenanceThisMonth,
+                  style: context.textStyle.bodySmall.copyWith(
+                    color: context.color.text.secondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  '${stats.maintenanceThisMonthCount} ${context.loc.maintenanceRecordsCount}',
+                  style: context.textStyle.headLineSmall.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: context.color.text.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (stats.maintenanceThisMonthCost > 0)
+            Text(
+              '৳ ${stats.maintenanceThisMonthCost.toStringAsFixed(0)}',
+              style: context.textStyle.headLineSmall.copyWith(
+                fontWeight: FontWeight.w700,
+                color: context.color.statusMaintenanceFg,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDashboardError(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(context.spacing.lg),
+      decoration: BoxDecoration(
+        color: context.color.errorBg,
+        borderRadius: BorderRadius.circular(context.radius.md),
+        border: Border.all(color: context.color.error.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.cloud_off_outlined, color: context.color.error),
+          SizedBox(width: context.spacing.md),
+          Expanded(
+            child: Text(
+              context.loc.loadDashboardFailed,
+              style: context.textStyle.bodyMedium.copyWith(
+                color: context.color.text.primary,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () =>
+                ref.read(dashboardStatsProvider.notifier).refresh(),
+            child: Text(context.loc.retry),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExpiringDocuments(BuildContext context, DashboardStats stats) {
+    return _buildSummaryPanel(
+      context,
+      title: context.loc.expiringSoonTitle,
+      icon: Icons.description_outlined,
+      children: stats.expiringSoon.map((document) {
+        final parsedDate = DateTime.tryParse(document.expiryDate);
+        final dateLabel = parsedDate == null
+            ? document.expiryDate
+            : MaterialLocalizations.of(context).formatMediumDate(parsedDate);
+        return ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: Icon(
+            Icons.warning_amber_outlined,
+            color: context.color.warning,
+          ),
+          title: Text(
+            '${document.vehicleNumber} · ${_documentTypeLabel(context, document.documentType)}',
+            style: context.textStyle.dataMedium.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          subtitle: Text('${context.loc.expiryDate}: $dateLabel'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => _navigateTo(_vehicleDetailsPath(document.vehicleNumber)),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildRecentMaintenance(BuildContext context, DashboardStats stats) {
+    return _buildSummaryPanel(
+      context,
+      title: context.loc.recentMaintenanceTitle,
+      icon: Icons.build_outlined,
+      children: stats.recentMaintenance.map((record) {
+        final parsedDate = DateTime.tryParse(record.maintenanceDate);
+        final dateLabel = parsedDate == null
+            ? record.maintenanceDate
+            : MaterialLocalizations.of(context).formatMediumDate(parsedDate);
+        return ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: Icon(Icons.build_outlined, color: context.color.primary),
+          title: Text(
+            '${record.vehicleNumber} · ${record.maintenanceType}',
+            style: context.textStyle.dataMedium.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          subtitle: Text('$dateLabel · ${record.workshop}'),
+          trailing: Text('৳ ${record.cost.toStringAsFixed(0)}'),
+          onTap: () => _navigateTo(_vehicleDetailsPath(record.vehicleNumber)),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildSummaryPanel(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
+    return Container(
+      padding: EdgeInsets.all(context.spacing.lg),
+      decoration: BoxDecoration(
+        color: context.color.surface,
+        borderRadius: BorderRadius.circular(context.radius.md),
+        border: Border.all(color: context.color.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: context.color.primary),
+              SizedBox(width: context.spacing.sm),
+              Text(
+                title,
+                style: context.textStyle.headLineSmall.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.spacing.sm),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  String _documentTypeLabel(BuildContext context, String documentType) {
+    switch (documentType.toUpperCase().replaceAll(' ', '_')) {
+      case 'REGISTRATION':
+        return context.loc.docRegistration;
+      case 'TAX_TOKEN':
+        return context.loc.docTaxToken;
+      case 'INSURANCE':
+        return context.loc.docInsurance;
+      case 'FITNESS':
+      case 'FITNESS_CERTIFICATE':
+        return context.loc.docFitness;
+      case 'OTHER':
+        return context.loc.docOther;
+      default:
+        return documentType;
+    }
+  }
+
+  String _vehicleDetailsPath(String vehicleNumber) => Routes.vehicleDetails.path
+      .replaceFirst(':vehicleNumber', Uri.encodeComponent(vehicleNumber));
 
   Widget _buildKpiGrid(DashboardStats stats, double screenWidth) {
     if (screenWidth >= 1024) {
@@ -193,10 +520,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           SizedBox(width: context.spacing.lg),
           Expanded(
             child: SummaryKpiCard(
-              label: context.loc.inServiceVehicles,
-              value: '${stats.inService}',
-              valueColor: context.color.warning,
-              onTap: () => _openVehicleList(Vehicle.statusInService),
+              label: context.loc.maintenanceVehicles,
+              value: '${stats.maintenance}',
+              valueColor: context.color.statusMaintenanceFg,
+              onTap: () => _openVehicleList(Vehicle.statusMaintenance),
             ),
           ),
           SizedBox(width: context.spacing.lg),
@@ -240,10 +567,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             children: [
               Expanded(
                 child: SummaryKpiCard(
-                  label: context.loc.inServiceVehicles,
-                  value: '${stats.inService}',
-                  valueColor: context.color.warning,
-                  onTap: () => _openVehicleList(Vehicle.statusInService),
+                  label: context.loc.maintenanceVehicles,
+                  value: '${stats.maintenance}',
+                  valueColor: context.color.statusMaintenanceFg,
+                  onTap: () => _openVehicleList(Vehicle.statusMaintenance),
                 ),
               ),
               SizedBox(width: context.spacing.lg),
@@ -278,10 +605,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
           SizedBox(height: context.spacing.md),
           SummaryKpiCard(
-            label: context.loc.inServiceVehicles,
-            value: '${stats.inService}',
-            valueColor: context.color.warning,
-            onTap: () => _openVehicleList(Vehicle.statusInService),
+            label: context.loc.maintenanceVehicles,
+            value: '${stats.maintenance}',
+            valueColor: context.color.statusMaintenanceFg,
+            onTap: () => _openVehicleList(Vehicle.statusMaintenance),
           ),
           SizedBox(height: context.spacing.md),
           SummaryKpiCard(

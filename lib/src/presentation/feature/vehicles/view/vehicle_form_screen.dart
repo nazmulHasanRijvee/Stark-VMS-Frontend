@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../../core/extensions/localization_extension.dart';
-import '../../../../domain/entities/vehicle.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/custom_toast.dart';
@@ -119,7 +118,6 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
       status: _selectedStatus,
     );
 
-    final duplicateLoc = context.loc.duplicateVehicleNumber;
     final successTitle = widget.mode == VehicleFormMode.register
         ? context.loc.vehicleRegisteredSuccess
         : context.loc.vehicleUpdatedSuccess;
@@ -146,10 +144,19 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
     if (!mounted) return;
 
     if (error != null) {
+      final localizedError = context.loc.localizedApiError(error);
+      final normalizedError = error.toLowerCase();
+      final isDuplicate =
+          normalizedError.contains('vehicle') &&
+          (normalizedError.contains('duplicate') ||
+              normalizedError.contains('already exists'));
       setState(() {
-        _duplicateError = duplicateLoc;
+        _duplicateError = isDuplicate ? localizedError : null;
         _isSubmitting = false;
       });
+      if (!isDuplicate) {
+        CustomToast.showError(context, title: localizedError);
+      }
       return;
     }
 

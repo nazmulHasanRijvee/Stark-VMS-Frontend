@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/entities/dashboard_stats.dart';
+import '../../domain/entities/paged_response.dart';
 import '../../domain/entities/vehicle.dart';
 import '../../domain/repositories/vehicles_repository.dart';
 import '../services/network/api_handler.dart';
@@ -26,13 +27,15 @@ class VehiclesRepositoryImpl implements VehiclesRepository {
   }
 
   @override
-  Future<List<Vehicle>> getVehicles({
+  Future<PagedResponse<Vehicle>> getVehiclesPaged({
     String? search,
     String? status,
     int page = 0,
-    int size = 100,
+    int size = 10,
+    String? sortBy,
+    String? sortDirection,
   }) async {
-    List<Vehicle> list = [];
+    PagedResponse<Vehicle> result = const PagedResponse.empty();
     _lastError = null;
 
     await Api.call(
@@ -41,33 +44,69 @@ class VehiclesRepositoryImpl implements VehiclesRepository {
         status: status,
         page: page,
         size: size,
+        sortBy: sortBy,
+        sortDirection: sortDirection,
       ),
       onSuccess: (response) {
-        List<dynamic> items = [];
         if (response is Map<String, dynamic>) {
-          final data = response['data'];
-          if (data is Map<String, dynamic> && data['content'] is List) {
-            items = data['content'] as List<dynamic>;
-          } else if (data is List) {
-            items = data;
-          } else if (response['content'] is List) {
-            items = response['content'] as List<dynamic>;
-          }
-        } else if (response is List) {
-          items = response;
-        }
+          final data = response['data'] is Map<String, dynamic>
+              ? response['data'] as Map<String, dynamic>
+              : response;
 
-        list = items
-            .whereType<Map<String, dynamic>>()
-            .map(Vehicle.fromMap)
-            .toList();
+          final contentList = data['content'] is List
+              ? data['content'] as List<dynamic>
+              : (response['content'] is List
+                    ? response['content'] as List<dynamic>
+                    : []);
+
+          final vehicles = contentList
+              .whereType<Map<String, dynamic>>()
+              .map(Vehicle.fromMap)
+              .toList();
+
+          final resPage = (data['page'] as num?)?.toInt() ?? page;
+          final resSize = (data['size'] as num?)?.toInt() ?? size;
+          final totalElements =
+              (data['totalElements'] as num?)?.toInt() ?? vehicles.length;
+          final totalPages =
+              (data['totalPages'] as num?)?.toInt() ??
+              (totalElements > 0 ? (totalElements / resSize).ceil() : 0);
+
+          result = PagedResponse<Vehicle>(
+            content: vehicles,
+            page: resPage,
+            size: resSize,
+            totalElements: totalElements,
+            totalPages: totalPages,
+          );
+        }
       },
       onError: (error) {
         _lastError = error;
       },
     );
 
-    return list;
+    return result;
+  }
+
+  @override
+  Future<List<Vehicle>> getVehicles({
+    String? search,
+    String? status,
+    int page = 0,
+    int size = 100,
+    String? sortBy,
+    String? sortDirection,
+  }) async {
+    final paged = await getVehiclesPaged(
+      search: search,
+      status: status,
+      page: page,
+      size: size,
+      sortBy: sortBy,
+      sortDirection: sortDirection,
+    );
+    return paged.content;
   }
 
   @override
@@ -149,6 +188,43 @@ class VehiclesRepositoryImpl implements VehiclesRepository {
     );
 
     return deleted;
+  }
+
+  @override
+  Future<Vehicle?> assignDriver(String vehicleNumber, int driverId) async {
+    Vehicle? updated;
+    _lastError = null;
+
+    await Api.call(
+      action: remote.assignDriver(vehicleNumber, {'driverId': driverId}),
+      onSuccess: (response) {
+        final data = _extractData(response);
+        updated = Vehicle.fromMap(data);
+      },
+      onError: (error) {
+        _lastError = error;
+      },
+    );
+
+    return updated;
+  }
+
+  @override
+  Future<bool> unassignDriver(String vehicleNumber) async {
+    bool unassigned = false;
+    _lastError = null;
+
+    await Api.call(
+      action: remote.unassignDriver(vehicleNumber),
+      onSuccess: (_) {
+        unassigned = true;
+      },
+      onError: (error) {
+        _lastError = error;
+      },
+    );
+
+    return unassigned;
   }
 
   @override

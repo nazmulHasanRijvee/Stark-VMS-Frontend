@@ -120,7 +120,7 @@ class _Primitive {
   static const Color errorBgDark = Color(0xFF881337);
   static const Color errorFgDark = Color(0xFFFECDD3);
 
-  /// Stitch: In Service Status Amber
+  /// Maintenance warning amber
   static const Color warning = Color(0xFFD97706);
   static const Color warningBgLight = Color(0xFFFFFBEB);
   static const Color warningFgLight = Color(0xFF92400E);

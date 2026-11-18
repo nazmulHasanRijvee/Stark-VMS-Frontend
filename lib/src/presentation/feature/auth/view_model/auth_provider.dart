@@ -50,7 +50,7 @@ class AuthState {
 }
 
 class AuthNotifier extends Notifier<AuthState> {
-  late final AuthenticationRepository _repository;
+  late AuthenticationRepository _repository;
 
   @override
   AuthState build() {

@@ -5,4 +5,3 @@ abstract interface class LocaleRepository {
 
   Future<void> clearLanguage();
 }
-

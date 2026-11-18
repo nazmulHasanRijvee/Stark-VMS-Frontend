@@ -138,6 +138,17 @@ class VmsAppShell extends ConsumerWidget {
                   _onNavigate(1);
                 },
               ),
+              SizedBox(height: context.spacing.xs),
+              _buildNavItem(
+                context: context,
+                icon: Icons.badge_outlined,
+                label: context.loc.navDrivers,
+                isSelected: currentIndex == 2,
+                onTap: () {
+                  if (isDrawer) Navigator.of(context).pop();
+                  _onNavigate(2);
+                },
+              ),
             ],
           ),
         ),

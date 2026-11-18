@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stark_vms/src/data/repositories/vehicles_repository_impl.dart';
 import 'package:stark_vms/src/data/services/cache/cache_service.dart';
-import 'package:stark_vms/src/domain/entities/vehicle.dart';
+import 'package:stark_vms/src/domain/entities/paged_response.dart';
 import 'package:stark_vms/src/domain/repositories/vehicles_repository.dart';
 import 'package:stark_vms/src/presentation/feature/vehicles/view_model/vehicles_provider.dart';
 
@@ -23,7 +23,7 @@ class InMemoryVehiclesRepository implements VehiclesRepository {
       type: 'Microbus / Van',
       brand: 'Nissan',
       model: 'Urvan',
-      status: Vehicle.statusInService,
+      status: Vehicle.statusMaintenance,
     ),
     const Vehicle(
       vehicleNumber: 'DHAKA METRO BA-11-2233',
@@ -44,9 +44,55 @@ class InMemoryVehiclesRepository implements VehiclesRepository {
   ];
 
   String? _lastError;
+  String? lastSearch;
+  String? lastStatus;
 
   @override
   String? get lastError => _lastError;
+
+  @override
+  Future<PagedResponse<Vehicle>> getVehiclesPaged({
+    String? search,
+    String? status,
+    int page = 0,
+    int size = 10,
+    String? sortBy,
+    String? sortDirection,
+  }) async {
+    lastSearch = search;
+    lastStatus = status;
+    var filtered = List<Vehicle>.from(_vehicles);
+    final query = search?.trim().toLowerCase();
+    if (query != null && query.isNotEmpty) {
+      filtered = filtered
+          .where(
+            (vehicle) =>
+                vehicle.vehicleNumber.toLowerCase().contains(query) ||
+                vehicle.company.toLowerCase().contains(query) ||
+                vehicle.type.toLowerCase().contains(query) ||
+                vehicle.brand.toLowerCase().contains(query) ||
+                vehicle.model.toLowerCase().contains(query),
+          )
+          .toList();
+    }
+    if (status != null) {
+      filtered = filtered.where((vehicle) => vehicle.status == status).toList();
+    }
+
+    final totalElements = filtered.length;
+    final safeSize = size > 0 ? size : 10;
+    final start = page * safeSize;
+    final content = start >= totalElements
+        ? <Vehicle>[]
+        : filtered.skip(start).take(safeSize).toList();
+    return PagedResponse<Vehicle>(
+      content: content,
+      page: page,
+      size: safeSize,
+      totalElements: totalElements,
+      totalPages: totalElements == 0 ? 0 : (totalElements / safeSize).ceil(),
+    );
+  }
 
   @override
   Future<List<Vehicle>> getVehicles({
@@ -54,9 +100,16 @@ class InMemoryVehiclesRepository implements VehiclesRepository {
     String? status,
     int page = 0,
     int size = 100,
-  }) async {
-    return List<Vehicle>.from(_vehicles);
-  }
+    String? sortBy,
+    String? sortDirection,
+  }) async => (await getVehiclesPaged(
+    search: search,
+    status: status,
+    page: page,
+    size: size,
+    sortBy: sortBy,
+    sortDirection: sortDirection,
+  )).content;
 
   @override
   Future<Vehicle?> getVehicle(String vehicleNumber) async {
@@ -108,10 +161,18 @@ class InMemoryVehiclesRepository implements VehiclesRepository {
   @override
   Future<bool> deleteVehicle(String vehicleNumber) async {
     final norm = vehicleNumber.trim().toUpperCase();
-    _vehicles =
-        _vehicles.where((v) => v.vehicleNumber.toUpperCase() != norm).toList();
+    _vehicles = _vehicles
+        .where((v) => v.vehicleNumber.toUpperCase() != norm)
+        .toList();
     return true;
   }
+
+  @override
+  Future<Vehicle?> assignDriver(String vehicleNumber, int driverId) async =>
+      null;
+
+  @override
+  Future<bool> unassignDriver(String vehicleNumber) async => false;
 
   @override
   Future<DashboardStats> getDashboardStats() async {
@@ -121,16 +182,23 @@ class InMemoryVehiclesRepository implements VehiclesRepository {
 
     for (final v in _vehicles) {
       if (v.status == Vehicle.statusActive) active++;
-      if (v.status == Vehicle.statusInService) inService++;
+      if (v.status == Vehicle.statusMaintenance) inService++;
       if (v.status == Vehicle.statusInactive) inactive++;
     }
 
     return DashboardStats(
       total: _vehicles.length,
       active: active,
-      inService: inService,
+      maintenance: inService,
       inactive: inactive,
     );
+  }
+}
+
+Future<void> _waitForVehiclesPage(ProviderContainer container) async {
+  for (var attempt = 0; attempt < 10; attempt++) {
+    if (!container.read(vehiclesPageProvider).isLoading) return;
+    await Future<void>.delayed(Duration.zero);
   }
 }
 
@@ -220,7 +288,7 @@ void main() {
           type: 'Heavy Truck',
           brand: 'Scania',
           model: 'R500',
-          status: Vehicle.statusInService,
+          status: Vehicle.statusMaintenance,
         );
 
         final error = await notifier.updateVehicle(
@@ -231,7 +299,7 @@ void main() {
 
         final vehicle = notifier.getVehicle('DHAKA METRO GA-12-3456');
         expect(vehicle?.company, 'Stark Corp Updated');
-        expect(vehicle?.status, Vehicle.statusInService);
+        expect(vehicle?.status, Vehicle.statusMaintenance);
       },
     );
 
@@ -253,21 +321,25 @@ void main() {
       final stats = container.read(dashboardStatsProvider);
       expect(stats.total, 4);
       expect(stats.active, 2);
-      expect(stats.inService, 1);
+      expect(stats.maintenance, 1);
       expect(stats.inactive, 1);
     });
 
-    test('filters vehicles by search query and status', () {
-      container.read(vehicleFilterProvider.notifier).setSearch('Urvan');
-      var filtered = container.read(filteredVehiclesProvider);
+    test('filters vehicles by search query and status', () async {
+      final filterNotifier = container.read(vehicleFilterProvider.notifier);
+      filterNotifier.setSearch('Urvan');
+      container.read(vehiclesPageProvider);
+      await _waitForVehiclesPage(container);
+      expect(fakeRepo.lastSearch, 'Urvan');
+      var filtered = container.read(vehiclesPageProvider).result.content;
       expect(filtered.length, 1);
       expect(filtered.first.vehicleNumber, 'DHAKA METRO CHA-55-9812');
 
-      container.read(vehicleFilterProvider.notifier).reset();
-      container
-          .read(vehicleFilterProvider.notifier)
-          .setStatus(Vehicle.statusActive);
-      filtered = container.read(filteredVehiclesProvider);
+      filterNotifier.reset();
+      filterNotifier.setStatus(Vehicle.statusActive);
+      await _waitForVehiclesPage(container);
+      expect(fakeRepo.lastStatus, Vehicle.statusActive);
+      filtered = container.read(vehiclesPageProvider).result.content;
       expect(filtered.length, 2);
       for (final v in filtered) {
         expect(v.status, Vehicle.statusActive);

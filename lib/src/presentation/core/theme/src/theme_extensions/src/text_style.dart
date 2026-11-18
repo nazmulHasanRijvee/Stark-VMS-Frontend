@@ -94,6 +94,15 @@ class TextStyleExtension extends ThemeExtension<TextStyleExtension> {
     );
   }
 
+  /// Compact text style for tabular and metadata values.
+  TextStyle get dataSmall {
+    return GoogleFonts.inter(
+      height: 1.33,
+      fontSize: 12,
+      fontWeight: FontWeight.w500,
+    );
+  }
+
   /// Large dashboard metric style.
   TextStyle get metricLarge {
     return GoogleFonts.inter(

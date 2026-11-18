@@ -1,4 +1,4 @@
-{
+﻿{
   "@@locale": "bn",
   "appName": "স্টার্ক ভিএমএস",
   "brandTag": "স্টার্ক ভিএমএস",
@@ -12,10 +12,14 @@
   "search": "অনুসন্ধান",
   "actions": "পদক্ষেপ",
   "viewAll": "সব দেখুন",
+  "loadMore": "আরও দেখুন",
+  "latest": "সর্বশেষ",
+  "optional": "ঐচ্ছিক",
   "loading": "লোড হচ্ছে...",
   "retry": "পুনরায় চেষ্টা করুন",
   "navDashboard": "ড্যাশবোর্ড",
   "navVehicles": "যানবাহন",
+  "navDrivers": "চালকবৃন্দ",
   "signOut": "সাইন আউট",
   "signedOutTitle": "সাইন আউট সম্পন্ন হয়েছে",
   "signedOutMessage": "সফলভাবে লগআউট করা হয়েছে।",
@@ -53,17 +57,31 @@
   "registerVehicle": "যানবাহন নিবন্ধন",
   "totalFleet": "মোট যানবাহন",
   "activeVehicles": "সক্রিয় যানবাহন",
-  "inServiceVehicles": "সার্ভিসাধীন যানবাহন",
+  "maintenanceVehicles": "রক্ষণাবেক্ষণ",
   "inactiveVehicles": "নিষ্ক্রিয় যানবাহন",
-  "recentlyAddedVehicles": "সম্প্রতি যুক্ত যানবাহন",
+  "recentlyAddedVehicles": "সাম্প্রতিক হালনাগাদ যানবাহন",
+  "sortBy": "সাজান",
+  "sortRecentlyUpdated": "সাম্প্রতিক হালনাগাদ",
+  "sortAscending": "ঊর্ধ্বক্রমে সাজান",
+  "sortDescending": "নিম্নক্রমে সাজান",
+  "loadVehiclesFailed": "যানবাহন লোড করা যায়নি",
+  "loadDashboardFailed": "ড্যাশবোর্ডের তথ্য লোড করা যায়নি",
+  "apiRequestFailed": "অনুরোধটি সম্পন্ন করা যায়নি। আবার চেষ্টা করুন।",
+  "duplicateLicenseNumber": "এই লাইসেন্স নম্বরে একজন চালক আগে থেকেই রয়েছে।",
+  "driverAssignmentConflict": "অ্যাসাইনমেন্ট পরিবর্তনের আগে চালককে আনঅ্যাসাইন করুন।",
+  "documentStorageUnavailable": "নথি সংরক্ষণ ব্যবস্থা সাময়িকভাবে অনুপলব্ধ। ফাইলটি নির্বাচিত রেখে আবার চেষ্টা করুন।",
+  "invalidDocumentFile": "১০ MB-এর মধ্যে বৈধ ও খালি নয় এমন PDF, JPEG বা PNG ফাইল বাছুন।",
+  "maintenanceDetailsInvalid": "রক্ষণাবেক্ষণের তারিখ, খরচ, কাজের ধরন ও ওয়ার্কশপের তথ্য যাচাই করুন।",
+  "resourceNotFound": "অনুরোধ করা রেকর্ডটি পাওয়া যায়নি।",
   "noVehiclesInFleet": "ফ্লিটে কোন যানবাহন নেই",
   "noVehiclesInFleetDesc": "শুরু করতে প্রথম যানবাহনটি নিবন্ধন করুন।",
   "vehiclesTitle": "যানবাহন তালিকা",
   "vehiclesSubtitle": "ফ্লিট যানবাহন পরিচালনা, অবস্থা ও বিবরণ পর্যবেক্ষণ করুন",
   "searchVehiclesHint": "যানবাহন নম্বর, কোম্পানি, বা ব্র্যান্ড দিয়ে খুঁজুন...",
   "allStatuses": "সকল অবস্থা",
+  "allTypes": "সব ধরনের নথি",
   "statusActive": "সক্রিয়",
-  "statusInService": "সার্ভিসাধীন",
+  "statusMaintenance": "রক্ষণাবেক্ষণ",
   "statusInactive": "নিষ্ক্রিয়",
   "colVehicleNumber": "যানবাহন নম্বর",
   "colCompany": "কোম্পানি",
@@ -108,15 +126,9 @@
   "showingPagination": "{total} টির মধ্যে {start} থেকে {end} টি দেখানো হচ্ছে",
   "@showingPagination": {
     "placeholders": {
-      "start": {
-        "type": "int"
-      },
-      "end": {
-        "type": "int"
-      },
-      "total": {
-        "type": "int"
-      }
+      "start": { "type": "int" },
+      "end": { "type": "int" },
+      "total": { "type": "int" }
     }
   },
   "deleteConfirmMessage": "আপনি কি নিশ্চিত যে {vehicleNumber} যানবাহনটি বহর থেকে মুছে ফেলতে চান?",
@@ -128,5 +140,137 @@
   "openNavigation": "নেভিগেশন খুলুন",
   "defaultUserName": "জন ডো",
   "select": "নির্বাচন করুন",
-  "backToVehicles": "গাড়ির তালিকায় ফিরে যান"
+  "backToVehicles": "গাড়ির তালিকায় ফিরে যান",
+
+  "driversTitle": "চালকবৃন্দ",
+  "driversSubtitle": "ফ্লিটের চালকদের প্রোফাইল, লাইসেন্স এবং অ্যাসাইনমেন্ট পরিচালনা করুন",
+  "searchDriversHint": "চালকের নাম, ফোন, লাইসেন্স বা যানবাহন দিয়ে খুঁজুন...",
+  "addDriver": "নতুন চালক যুক্ত করুন",
+  "editDriver": "চালক সম্পাদনা",
+  "deleteDriver": "চালক মুছুন",
+  "driverName": "চালকের নাম",
+  "driverNameRequired": "চালকের নাম লিখুন",
+  "phone": "ফোন নম্বর",
+  "phoneRequired": "ফোন নম্বর লিখুন",
+  "phoneHint": "+880 1712-345678",
+  "licenseNumber": "লাইসেন্স নম্বর",
+  "licenseNumberRequired": "লাইসেন্স নম্বর লিখুন",
+  "licenseNumberHint": "DHAKA-M-123456",
+  "licenseExpiry": "লাইসেন্সের মেয়াদ",
+  "licenseExpiryRequired": "লাইসেন্সের মেয়াদ শেষ হওয়ার তারিখ লিখুন",
+  "assignedVehicle": "অ্যাসাইনকৃত যানবাহন",
+  "unassigned": "অ্যাসাইন করা হয়নি",
+  "driverCreatedSuccess": "চালক সফলভাবে নিবন্ধিত হয়েছে",
+  "driverUpdatedSuccess": "চালক তথ্য সফলভাবে হালনাগাদ হয়েছে",
+  "driverDeletedSuccess": "চালক সফলভাবে মুছে ফেলা হয়েছে",
+  "deleteDriverConfirm": "আপনি কি নিশ্চিত যে {name} চালককে মুছে ফেলতে চান?",
+  "@deleteDriverConfirm": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "cannotDeleteAssignedDriver": "অ্যাসাইন করা চালককে মোছা যাবে না। অনুগ্রহ করে প্রথমে গাড়ির অ্যাসাইনমেন্ট বাতিল করুন।",
+  "assignDriver": "চালক অ্যাসাইন করুন",
+  "changeDriver": "চালক পরিবর্তন করুন",
+  "unassignDriver": "চালক বাতিল করুন",
+  "unassignDriverFailed": "চালককে আনঅ্যাসাইন করা যায়নি",
+  "unassignDriverConfirm": "আপনি কি নিশ্চিত যে এই যানবাহন থেকে বর্তমান চালককে আনঅ্যাসাইন করবেন?",
+  "assignDriverFailed": "চালককে অ্যাসাইন করা যায়নি",
+  "driverAssignedSuccess": "চালক সফলভাবে অ্যাসাইন করা হয়েছে",
+  "driverUnassignedSuccess": "চালক অ্যাসাইনমেন্ট সফলভাবে বাতিল করা হয়েছে",
+  "noDriverAssigned": "বর্তমানে কোন চালক অ্যাসাইন করা নেই",
+  "selectDriver": "একজন সক্রিয় চালক নির্বাচন করুন",
+  "noAvailableDrivers": "কোন সক্রিয় চালক খালি নেই।",
+  "noDriversFound": "কোনো চালক পাওয়া যায়নি",
+
+  "vehicleDetailsTitle": "যানবাহনের বিবরণ",
+  "tabOverview": "সারসংক্ষেপ",
+  "tabDocuments": "নথিপত্র",
+  "tabMaintenance": "রক্ষণাবেক্ষণ",
+  "vehicleSpecifications": "যানবাহনের বিবরণ",
+  "assignedDriverCard": "অ্যাসাইনকৃত চালক",
+
+  "uploadDocument": "নথি আপলোড করুন",
+  "documentHistory": "নথির ইতিহাস",
+  "documentType": "নথির ধরণ",
+  "expiryDate": "মেয়াদের তারিখ",
+  "isoDateFormat": "YYYY-MM-DD",
+  "expiryState": "মেয়াদের অবস্থা",
+  "docRegistration": "রেজিস্ট্রেশন",
+  "docTaxToken": "ট্যাক্স টোকেন",
+  "docInsurance": "ইন্স্যুরেন্স",
+  "docFitness": "ফিটনেস সার্টিফিকেট",
+  "docOther": "অন্যান্য",
+  "statusValid": "বৈধ",
+  "statusExpiringSoon": "শীঘ্রই মেয়াদোত্তীর্ণ",
+  "statusExpired": "মেয়াদোত্তীর্ণ",
+  "statusNoExpiry": "মেয়াদের তারিখ নেই",
+  "download": "ডাউনলোড",
+  "selectFile": "ফাইল নির্বাচন করুন",
+  "fileSelected": "নির্বাচিত: {name}",
+  "@fileSelected": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "uploadSuccess": "নথি সফলভাবে আপলোড হয়েছে",
+  "acceptedDocumentTypes": "PDF, JPG বা PNG বাছুন (সর্বোচ্চ ১০ MB)",
+  "unsupportedDocumentType": "PDF, JPG বা PNG ফাইল বাছুন",
+  "cannotReadSelectedFile": "নির্বাচিত ফাইলটি পড়া যায়নি। আবার বাছুন।",
+  "documentFileTooLarge": "ফাইলের আকার ১০ MB বা তার কম হতে হবে",
+  "selectDocumentFirst": "আপলোড করার আগে একটি নথি বাছুন",
+  "downloadLinkFailed": "নথির ডাউনলোড লিংক তৈরি করা যায়নি",
+  "noDocumentsYet": "এখনও কোন নথি আপলোড করা হয়নি।",
+
+  "addMaintenanceRecord": "রক্ষণাবেক্ষণ রেকর্ড যোগ করুন",
+  "maintenanceHistory": "রক্ষণাবেক্ষণ ইতিহাস",
+  "maintenanceType": "কাজের ধরণ",
+  "cost": "খরচ (টাকা)",
+  "costHint": "যেমন ৪৫০০.০০",
+  "costRequired": "খরচ লিখুন",
+  "costInvalid": "শূন্য বা তার বেশি সঠিক পরিমাণ লিখুন",
+  "workshop": "ওয়ার্কশপ / ভেন্ডর",
+  "workshopHint": "যেমন নাভানা টয়োটা সার্ভিস সেন্টার",
+  "notes": "মন্তব্য / বিবরণ",
+  "maintenanceNotesHint": "সম্পন্ন কাজের বিবরণ লিখুন",
+  "maintenanceDate": "তারিখ",
+  "maintenanceScheduledService": "নির্ধারিত সার্ভিস",
+  "maintenanceOilChange": "ইঞ্জিন অয়েল পরিবর্তন",
+  "maintenanceTireReplacement": "টায়ার পরিবর্তন",
+  "maintenanceBrakeRepair": "ব্রেক পরীক্ষা / মেরামত",
+  "maintenanceEngineDiagnostics": "ইঞ্জিন ডায়াগনস্টিকস",
+  "maintenanceBatteryReplacement": "ব্যাটারি পরিবর্তন",
+  "maintenanceSuspensionAlignment": "সাসপেনশন ও অ্যালাইনমেন্ট",
+  "maintenanceBodyPaint": "বডি ও রং",
+  "maintenanceEmergencyRepair": "জরুরি মেরামত",
+  "maintenanceOther": "অন্যান্য",
+  "maintenanceAddedSuccess": "রক্ষণাবেক্ষণ রেকর্ড সফলভাবে যোগ করা হয়েছে",
+  "addMaintenanceFailed": "রক্ষণাবেক্ষণ রেকর্ড যোগ করা যায়নি",
+  "workshopRequired": "ওয়ার্কশপের নাম লিখুন",
+  "noMaintenanceYet": "এখনও কোন রক্ষণাবেক্ষণের রেকর্ড নেই।",
+
+  "maintenanceThisMonth": "এই মাসের রক্ষণাবেক্ষণ",
+  "maintenanceRecordsCount": "রেকর্ড",
+  "allTimeMaintenanceSpend": "সর্বমোট রক্ষণাবেক্ষণ ব্যয়",
+  "recentMaintenanceTitle": "সাম্প্রতিক রক্ষণাবেক্ষণ",
+  "noRecentMaintenance": "সাম্প্রতিক কোনো রক্ষণাবেক্ষণ রেকর্ড নেই",
+  "expiringSoonTitle": "শীঘ্রই মেয়াদ শেষ হবে এমন নথি",
+  "noExpiringSoonDocuments": "শীঘ্রই মেয়াদ শেষ হবে এমন নথি নেই",
+  "documentExpiryAlertTitle": "নথির মেয়াদ সংক্রান্ত সতর্কতা",
+  "documentExpiryAlertExpired": "{count}টি নথির মেয়াদ শেষ হয়েছে",
+  "@documentExpiryAlertExpired": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "documentExpiryAlertExpiring": "{count}টি নথির মেয়াদ শীঘ্রই শেষ হবে",
+  "@documentExpiryAlertExpiring": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "expiringDocumentsAttention": "শীঘ্রই মেয়াদোত্তীর্ণ নথি",
+  "expiredDocumentsAlert": "মেয়াদোত্তীর্ণ নথি",
+  "attentionRequired": "জরুরী দৃষ্টি আকর্ষণ",
+  "allDocumentsHealthy": "সমস্ত যানবাহনের নথিপত্র বর্তমানে হালনাগাদ রয়েছে।"
 }

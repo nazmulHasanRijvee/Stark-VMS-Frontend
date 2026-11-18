@@ -65,7 +65,7 @@ void main() {
       expect(locEn.navVehicles, 'Vehicles');
       expect(locEn.totalFleet, 'Total Fleet');
       expect(locEn.statusActive, 'Active');
-      expect(locEn.statusInService, 'In Service');
+      expect(locEn.statusMaintenance, 'Maintenance');
       expect(locEn.statusInactive, 'Inactive');
       expect(locEn.showingPagination(1, 4, 4), 'Showing 1 to 4 of 4 vehicles');
     });
@@ -77,7 +77,7 @@ void main() {
       expect(locBn.navVehicles, 'যানবাহন');
       expect(locBn.totalFleet, 'মোট যানবাহন');
       expect(locBn.statusActive, 'সক্রিয়');
-      expect(locBn.statusInService, 'সার্ভিসাধীন');
+      expect(locBn.statusMaintenance, 'রক্ষণাবেক্ষণ');
       expect(locBn.statusInactive, 'নিষ্ক্রিয়');
       expect(
         locBn.showingPagination(1, 4, 4),

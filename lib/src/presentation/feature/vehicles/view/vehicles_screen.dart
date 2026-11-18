@@ -1,11 +1,12 @@
 import 'dart:math' as math;
+import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../core/extensions/localization_extension.dart';
-import '../../../../domain/entities/vehicle.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/custom_toast.dart';
@@ -26,6 +27,7 @@ class VehiclesScreen extends ConsumerStatefulWidget {
 
 class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
   final _searchController = TextEditingController();
+  Timer? _searchDebounce;
 
   /// Defers route changes to the next frame to avoid triggering a Navigator
   /// mutation during an active pointer-event dispatch cycle, which causes the
@@ -45,12 +47,16 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _searchController.dispose();
     super.dispose();
   }
 
   void _onSearchChanged(String value) {
-    ref.read(vehicleFilterProvider.notifier).setSearch(value);
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 300), () {
+      if (mounted) ref.read(vehicleFilterProvider.notifier).setSearch(value);
+    });
   }
 
   void _onStatusChanged(String? status) {
@@ -77,6 +83,17 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
     });
   }
 
+  void _openVehicleDetails(Vehicle vehicle) {
+    final path = Routes.vehicleDetails.path.replaceFirst(
+      ':vehicleNumber',
+      Uri.encodeComponent(vehicle.vehicleNumber),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.go(path);
+    });
+  }
+
   Future<void> _handleDelete(Vehicle vehicle) async {
     final confirmed = await DeleteConfirmDialog.show(
       context,
@@ -85,14 +102,21 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
 
     if (confirmed == true && mounted) {
       final successLoc = context.loc.vehicleDeletedSuccess;
-      await ref
+      final success = await ref
           .read(vehiclesProvider.notifier)
           .deleteVehicle(vehicle.vehicleNumber);
       if (mounted) {
-        CustomToast.showSuccess(
-          context,
-          title: successLoc,
-        );
+        if (success) {
+          CustomToast.showSuccess(context, title: successLoc);
+        } else {
+          final error = ref.read(vehiclesProvider.notifier).lastError;
+          CustomToast.showError(
+            context,
+            title: error == null
+                ? context.loc.apiRequestFailed
+                : context.loc.localizedApiError(error),
+          );
+        }
       }
     }
   }
@@ -111,9 +135,11 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
       );
     });
 
-    final totalVehicles = ref.watch(vehiclesProvider);
-    final filteredVehicles = ref.watch(filteredVehiclesProvider);
     final filter = ref.watch(vehicleFilterProvider);
+    final pageState = ref.watch(vehiclesPageProvider);
+    final page = pageState.result;
+    final vehicles = page.content;
+    final isLoading = pageState.isLoading;
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isDesktop = screenWidth >= 900;
 
@@ -206,7 +232,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                       ),
                     ],
                   ),
-                  child: screenWidth < 700
+                  child: screenWidth < 900
                       ? Column(
                           children: [
                             _buildSearchInput(context),
@@ -217,8 +243,15 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                                   child: _buildStatusDropdown(context, filter),
                                 ),
                                 SizedBox(width: context.spacing.sm),
-                                _buildResetButton(context),
+                                Expanded(
+                                  child: _buildSortDropdown(context, filter),
+                                ),
                               ],
+                            ),
+                            SizedBox(height: context.spacing.sm),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: _buildResetButton(context),
                             ),
                           ],
                         )
@@ -231,6 +264,11 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                               child: _buildStatusDropdown(context, filter),
                             ),
                             SizedBox(width: context.spacing.sm),
+                            SizedBox(
+                              width: context.sizes.filterInputWidth,
+                              child: _buildSortDropdown(context, filter),
+                            ),
+                            SizedBox(width: context.spacing.sm),
                             _buildResetButton(context),
                           ],
                         ),
@@ -239,121 +277,151 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                 SizedBox(height: context.spacing.md),
 
                 // Vehicle Records List or Table
-                Container(
-                  decoration: BoxDecoration(
-                    color: context.color.surface,
-                    borderRadius: BorderRadius.circular(context.radius.md),
-                    border: Border.all(color: context.color.border),
-                    boxShadow: [
-                      BoxShadow(
-                        color: context.color.text.primary.withValues(
-                          alpha: 0.04,
-                        ),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      if (filteredVehicles.isEmpty)
-                        _buildEmptyResults(
-                          context: context,
-                          hasAnyVehicle: totalVehicles.isNotEmpty,
-                        )
-                      else if (isDesktop)
-                        _buildDesktopTable(context, filteredVehicles)
-                      else
-                        _buildMobileCardList(context, filteredVehicles),
-
-                      // Result Summary Footer
-                      if (filteredVehicles.isNotEmpty)
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.spacing.lg2,
-                            vertical: context.spacing.md2,
+                Skeletonizer(
+                  enabled: isLoading,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: context.color.surface,
+                      borderRadius: BorderRadius.circular(context.radius.md),
+                      border: Border.all(color: context.color.border),
+                      boxShadow: [
+                        BoxShadow(
+                          color: context.color.text.primary.withValues(
+                            alpha: 0.04,
                           ),
-                          decoration: BoxDecoration(
-                            color: context.color.surfaceSubtle,
-                            border: Border(
-                              top: BorderSide(color: context.color.border),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (vehicles.isEmpty && !isLoading)
+                          _buildEmptyResults(
+                            context: context,
+                            hasAnyVehicle: page.totalElements > 0,
+                            errorMessage: pageState.errorMessage,
+                          )
+                        else if (isDesktop)
+                          _buildDesktopTable(context, vehicles)
+                        else
+                          _buildMobileCardList(context, vehicles),
+
+                        // Result Summary Footer
+                        if (vehicles.isNotEmpty)
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.spacing.lg2,
+                              vertical: context.spacing.md2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: context.color.surfaceSubtle,
+                              border: Border(
+                                top: BorderSide(color: context.color.border),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  context.loc.showingPagination(
+                                    page.page * page.size + 1,
+                                    page.page * page.size + vehicles.length,
+                                    page.totalElements,
+                                  ),
+                                  style: context.textStyle.bodySmall.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                    color: context.color.text.secondary,
+                                  ),
+                                ),
+                                if (page.totalPages > 1)
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        onPressed: page.hasPrevious
+                                            ? () => ref
+                                                  .read(
+                                                    vehicleFilterProvider
+                                                        .notifier,
+                                                  )
+                                                  .setPage(page.page - 1)
+                                            : null,
+                                        icon: Icon(
+                                          Icons.chevron_left,
+                                          size: context.sizes.iconSm,
+                                          color: page.hasPrevious
+                                              ? context.color.text.primary
+                                              : context.color.text.tertiary,
+                                        ),
+                                        padding: EdgeInsets.zero,
+                                        constraints: BoxConstraints(
+                                          minWidth: context
+                                              .sizes
+                                              .paginationButtonSize,
+                                          minHeight: context
+                                              .sizes
+                                              .paginationButtonSize,
+                                        ),
+                                      ),
+                                      Container(
+                                        width: context
+                                            .sizes
+                                            .paginationIndicatorSize,
+                                        height: context
+                                            .sizes
+                                            .paginationIndicatorSize,
+                                        decoration: BoxDecoration(
+                                          color: context.color.primary,
+                                          borderRadius: BorderRadius.circular(
+                                            context.radius.xs2,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            '${page.page + 1}',
+                                            style: context.textStyle.labelSmall
+                                                .copyWith(
+                                                  color:
+                                                      context.color.onPrimary,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                          ),
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: page.hasNext
+                                            ? () => ref
+                                                  .read(
+                                                    vehicleFilterProvider
+                                                        .notifier,
+                                                  )
+                                                  .setPage(page.page + 1)
+                                            : null,
+                                        icon: Icon(
+                                          Icons.chevron_right,
+                                          size: context.sizes.iconSm,
+                                          color: page.hasNext
+                                              ? context.color.text.primary
+                                              : context.color.text.tertiary,
+                                        ),
+                                        padding: EdgeInsets.zero,
+                                        constraints: BoxConstraints(
+                                          minWidth: context
+                                              .sizes
+                                              .paginationButtonSize,
+                                          minHeight: context
+                                              .sizes
+                                              .paginationButtonSize,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                              ],
                             ),
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                context.loc.showingPagination(
-                                  filteredVehicles.isNotEmpty ? 1 : 0,
-                                  filteredVehicles.length,
-                                  totalVehicles.length,
-                                ),
-                                style: context.textStyle.bodySmall.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                  color: context.color.text.secondary,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  IconButton(
-                                    onPressed: null,
-                                    icon: Icon(
-                                      Icons.chevron_left,
-                                      size: context.sizes.iconSm,
-                                      color: context.color.text.tertiary,
-                                    ),
-                                    padding: EdgeInsets.zero,
-                                    constraints: BoxConstraints(
-                                      minWidth:
-                                          context.sizes.paginationButtonSize,
-                                      minHeight:
-                                          context.sizes.paginationButtonSize,
-                                    ),
-                                  ),
-                                  Container(
-                                    width:
-                                        context.sizes.paginationIndicatorSize,
-                                    height:
-                                        context.sizes.paginationIndicatorSize,
-                                    decoration: BoxDecoration(
-                                      color: context.color.primary,
-                                      borderRadius: BorderRadius.circular(
-                                        context.radius.xs2,
-                                      ),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        '1',
-                                        style: context.textStyle.labelSmall
-                                            .copyWith(
-                                              color: context.color.onPrimary,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                      ),
-                                    ),
-                                  ),
-                                  IconButton(
-                                    onPressed: null,
-                                    icon: Icon(
-                                      Icons.chevron_right,
-                                      size: context.sizes.iconSm,
-                                      color: context.color.text.tertiary,
-                                    ),
-                                    padding: EdgeInsets.zero,
-                                    constraints: BoxConstraints(
-                                      minWidth:
-                                          context.sizes.paginationButtonSize,
-                                      minHeight:
-                                          context.sizes.paginationButtonSize,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -410,7 +478,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
     final statuses = [
       VehicleFilterState.allStatuses,
       Vehicle.statusActive,
-      Vehicle.statusInService,
+      Vehicle.statusMaintenance,
       Vehicle.statusInactive,
     ];
 
@@ -450,6 +518,85 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
             }
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildSortDropdown(BuildContext context, VehicleFilterState filter) {
+    final sortFields = <String, String>{
+      'updatedAt': context.loc.sortRecentlyUpdated,
+      'vehicleNumber': context.loc.colVehicleNumber,
+      'companyName': context.loc.colCompany,
+      'vehicleType': context.loc.colType,
+      'brand': context.loc.colBrand,
+      'model': context.loc.colModel,
+      'status': context.loc.colStatus,
+    };
+
+    return Container(
+      height: context.sizes.compactControlHeight,
+      padding: EdgeInsets.symmetric(horizontal: context.spacing.sm),
+      decoration: BoxDecoration(
+        color: context.color.textFieldFillColor,
+        borderRadius: BorderRadius.circular(context.radius.sm),
+        border: Border.all(color: context.color.border),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: filter.sortBy,
+                isExpanded: true,
+                dropdownColor: context.color.surface,
+                style: context.textStyle.bodySmall.copyWith(
+                  color: context.color.text.primary,
+                ),
+                items: sortFields.entries
+                    .map(
+                      (entry) => DropdownMenuItem(
+                        value: entry.key,
+                        child: Text(
+                          '${context.loc.sortBy}: ${entry.value}',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    ref
+                        .read(vehicleFilterProvider.notifier)
+                        .setSort(value, filter.sortDirection);
+                  }
+                },
+              ),
+            ),
+          ),
+          IconButton(
+            tooltip: filter.sortDirection == 'asc'
+                ? context.loc.sortAscending
+                : context.loc.sortDescending,
+            onPressed: () => ref
+                .read(vehicleFilterProvider.notifier)
+                .setSort(
+                  filter.sortBy,
+                  filter.sortDirection == 'asc' ? 'desc' : 'asc',
+                ),
+            icon: Icon(
+              filter.sortDirection == 'asc'
+                  ? Icons.arrow_upward
+                  : Icons.arrow_downward,
+              size: context.sizes.iconSm,
+              color: context.color.icon,
+            ),
+            padding: EdgeInsets.zero,
+            constraints: BoxConstraints(
+              minWidth: context.sizes.paginationButtonSize,
+              minHeight: context.sizes.paginationButtonSize,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -626,13 +773,17 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                           horizontal: context.spacing.md,
                           vertical: context.spacing.md2,
                         ),
-                        child: Text(
-                          v.vehicleNumber,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: context.textStyle.bodyMedium.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: context.color.text.primary,
+                        child: InkWell(
+                          onTap: () => _openVehicleDetails(v),
+                          child: Text(
+                            v.vehicleNumber,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: context.textStyle.bodyMedium.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: context.color.primary,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ),
                       ),
@@ -711,6 +862,44 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            InkWell(
+                              onTap: () => _openVehicleDetails(v),
+                              borderRadius: BorderRadius.circular(
+                                context.radius.xs2,
+                              ),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: context.spacing.sm2,
+                                  vertical: context.spacing.xs,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: context.color.surfaceSubtle,
+                                  borderRadius: BorderRadius.circular(
+                                    context.radius.xs2,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.visibility_outlined,
+                                      size: context.sizes.iconXs,
+                                      color: context.color.primary,
+                                    ),
+                                    SizedBox(width: context.spacing.xs),
+                                    Text(
+                                      context.loc.tabOverview,
+                                      style: context.textStyle.labelSmall
+                                          .copyWith(
+                                            color: context.color.primary,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: context.spacing.xs),
                             InkWell(
                               onTap: () => _openVehicleEditor(v),
                               borderRadius: BorderRadius.circular(
@@ -925,6 +1114,27 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   OutlinedButton.icon(
+                    onPressed: () => _openVehicleDetails(v),
+                    icon: Icon(
+                      Icons.visibility_outlined,
+                      size: context.sizes.iconXs,
+                    ),
+                    label: Text(context.loc.tabOverview),
+                    style: OutlinedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.spacing.sm3,
+                        vertical: context.spacing.xs,
+                      ),
+                      foregroundColor: context.color.primary,
+                      backgroundColor: context.color.surfaceSubtle,
+                      side: BorderSide(color: context.color.border),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(context.radius.sm),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: context.spacing.sm),
+                  OutlinedButton.icon(
                     onPressed: () => _openVehicleEditor(v),
                     icon: Icon(Icons.edit_outlined, size: context.sizes.iconXs),
                     label: Text(context.loc.edit),
@@ -975,6 +1185,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
   Widget _buildEmptyResults({
     required BuildContext context,
     required bool hasAnyVehicle,
+    String? errorMessage,
   }) {
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -999,7 +1210,9 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
           ),
           SizedBox(height: context.spacing.lg),
           Text(
-            hasAnyVehicle
+            errorMessage != null
+                ? context.loc.loadVehiclesFailed
+                : hasAnyVehicle
                 ? context.loc.noVehiclesMatch
                 : context.loc.noVehiclesInFleet,
             style: context.textStyle.headLineSmall.copyWith(
@@ -1009,7 +1222,9 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
           ),
           SizedBox(height: context.spacing.xs),
           Text(
-            hasAnyVehicle
+            errorMessage != null
+                ? context.loc.localizedApiError(errorMessage)
+                : hasAnyVehicle
                 ? context.loc.tryAdjustingFilters
                 : context.loc.noVehiclesInFleetDesc,
             textAlign: TextAlign.center,
@@ -1018,7 +1233,14 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
             ),
           ),
           SizedBox(height: context.spacing.lg2),
-          if (hasAnyVehicle)
+          if (errorMessage != null)
+            OutlinedButton.icon(
+              onPressed: () =>
+                  ref.read(vehiclesPageProvider.notifier).fetchPage(),
+              icon: Icon(Icons.refresh, size: context.sizes.xs),
+              label: Text(context.loc.retry),
+            )
+          else if (hasAnyVehicle)
             OutlinedButton.icon(
               onPressed: _resetFilter,
               icon: Icon(Icons.restart_alt, size: context.sizes.xs),

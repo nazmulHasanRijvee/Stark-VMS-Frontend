@@ -170,6 +170,24 @@ abstract class AppLocalizations {
   /// **'View All'**
   String get viewAll;
 
+  /// No description provided for @loadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load More'**
+  String get loadMore;
+
+  /// No description provided for @latest.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest'**
+  String get latest;
+
+  /// No description provided for @optional.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional'**
+  String get optional;
+
   /// No description provided for @loading.
   ///
   /// In en, this message translates to:
@@ -193,6 +211,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Vehicles'**
   String get navVehicles;
+
+  /// No description provided for @navDrivers.
+  ///
+  /// In en, this message translates to:
+  /// **'Drivers'**
+  String get navDrivers;
 
   /// No description provided for @signOut.
   ///
@@ -416,11 +440,11 @@ abstract class AppLocalizations {
   /// **'Active Vehicles'**
   String get activeVehicles;
 
-  /// No description provided for @inServiceVehicles.
+  /// No description provided for @maintenanceVehicles.
   ///
   /// In en, this message translates to:
-  /// **'In Service'**
-  String get inServiceVehicles;
+  /// **'Maintenance'**
+  String get maintenanceVehicles;
 
   /// No description provided for @inactiveVehicles.
   ///
@@ -431,8 +455,86 @@ abstract class AppLocalizations {
   /// No description provided for @recentlyAddedVehicles.
   ///
   /// In en, this message translates to:
-  /// **'Recently Added Vehicles'**
+  /// **'Recently Updated Vehicles'**
   String get recentlyAddedVehicles;
+
+  /// No description provided for @sortBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by'**
+  String get sortBy;
+
+  /// No description provided for @sortRecentlyUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Recently updated'**
+  String get sortRecentlyUpdated;
+
+  /// No description provided for @sortAscending.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort ascending'**
+  String get sortAscending;
+
+  /// No description provided for @sortDescending.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort descending'**
+  String get sortDescending;
+
+  /// No description provided for @loadVehiclesFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load vehicles'**
+  String get loadVehiclesFailed;
+
+  /// No description provided for @loadDashboardFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load dashboard metrics'**
+  String get loadDashboardFailed;
+
+  /// No description provided for @apiRequestFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The request could not be completed. Please try again.'**
+  String get apiRequestFailed;
+
+  /// No description provided for @duplicateLicenseNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'A driver with this license number already exists.'**
+  String get duplicateLicenseNumber;
+
+  /// No description provided for @driverAssignmentConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'Unassign this driver before changing its status or assignment.'**
+  String get driverAssignmentConflict;
+
+  /// No description provided for @documentStorageUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Document storage is temporarily unavailable. Keep the file selected and retry.'**
+  String get documentStorageUnavailable;
+
+  /// No description provided for @invalidDocumentFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a valid, non-empty PDF, JPEG, or PNG file up to 10 MB.'**
+  String get invalidDocumentFile;
+
+  /// No description provided for @maintenanceDetailsInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the maintenance date, cost, type, and workshop details.'**
+  String get maintenanceDetailsInvalid;
+
+  /// No description provided for @resourceNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'The requested record could not be found.'**
+  String get resourceNotFound;
 
   /// No description provided for @noVehiclesInFleet.
   ///
@@ -470,17 +572,23 @@ abstract class AppLocalizations {
   /// **'All Statuses'**
   String get allStatuses;
 
+  /// No description provided for @allTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'All Types'**
+  String get allTypes;
+
   /// No description provided for @statusActive.
   ///
   /// In en, this message translates to:
   /// **'Active'**
   String get statusActive;
 
-  /// No description provided for @statusInService.
+  /// No description provided for @statusMaintenance.
   ///
   /// In en, this message translates to:
-  /// **'In Service'**
-  String get statusInService;
+  /// **'Maintenance'**
+  String get statusMaintenance;
 
   /// No description provided for @statusInactive.
   ///
@@ -763,6 +871,648 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back to Vehicles'**
   String get backToVehicles;
+
+  /// No description provided for @driversTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Drivers'**
+  String get driversTitle;
+
+  /// No description provided for @driversSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage fleet driver profiles, licenses, and assignments'**
+  String get driversSubtitle;
+
+  /// No description provided for @searchDriversHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by driver name, phone, license, or vehicle...'**
+  String get searchDriversHint;
+
+  /// No description provided for @addDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Driver'**
+  String get addDriver;
+
+  /// No description provided for @editDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Driver'**
+  String get editDriver;
+
+  /// No description provided for @deleteDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Driver'**
+  String get deleteDriver;
+
+  /// No description provided for @driverName.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver Name'**
+  String get driverName;
+
+  /// No description provided for @driverNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver name is required'**
+  String get driverNameRequired;
+
+  /// No description provided for @phone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Number'**
+  String get phone;
+
+  /// No description provided for @phoneRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number is required'**
+  String get phoneRequired;
+
+  /// No description provided for @phoneHint.
+  ///
+  /// In en, this message translates to:
+  /// **'+880 1712-345678'**
+  String get phoneHint;
+
+  /// No description provided for @licenseNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'License Number'**
+  String get licenseNumber;
+
+  /// No description provided for @licenseNumberRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'License number is required'**
+  String get licenseNumberRequired;
+
+  /// No description provided for @licenseNumberHint.
+  ///
+  /// In en, this message translates to:
+  /// **'DHAKA-M-123456'**
+  String get licenseNumberHint;
+
+  /// No description provided for @licenseExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'License Expiry Date'**
+  String get licenseExpiry;
+
+  /// No description provided for @licenseExpiryRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'License expiry date is required'**
+  String get licenseExpiryRequired;
+
+  /// No description provided for @assignedVehicle.
+  ///
+  /// In en, this message translates to:
+  /// **'Assigned Vehicle'**
+  String get assignedVehicle;
+
+  /// No description provided for @unassigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Unassigned'**
+  String get unassigned;
+
+  /// No description provided for @driverCreatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver added successfully'**
+  String get driverCreatedSuccess;
+
+  /// No description provided for @driverUpdatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver updated successfully'**
+  String get driverUpdatedSuccess;
+
+  /// No description provided for @driverDeletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver deleted successfully'**
+  String get driverDeletedSuccess;
+
+  /// No description provided for @deleteDriverConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete driver {name}?'**
+  String deleteDriverConfirm(Object name);
+
+  /// No description provided for @cannotDeleteAssignedDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot delete an assigned driver. Please unassign the vehicle first.'**
+  String get cannotDeleteAssignedDriver;
+
+  /// No description provided for @assignDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign Driver'**
+  String get assignDriver;
+
+  /// No description provided for @changeDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Driver'**
+  String get changeDriver;
+
+  /// No description provided for @unassignDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Unassign Driver'**
+  String get unassignDriver;
+
+  /// No description provided for @unassignDriverFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not unassign the driver'**
+  String get unassignDriverFailed;
+
+  /// No description provided for @unassignDriverConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to unassign the current driver from this vehicle?'**
+  String get unassignDriverConfirm;
+
+  /// No description provided for @assignDriverFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not assign the driver'**
+  String get assignDriverFailed;
+
+  /// No description provided for @driverAssignedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver assigned successfully'**
+  String get driverAssignedSuccess;
+
+  /// No description provided for @driverUnassignedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver unassigned successfully'**
+  String get driverUnassignedSuccess;
+
+  /// No description provided for @noDriverAssigned.
+  ///
+  /// In en, this message translates to:
+  /// **'No driver currently assigned'**
+  String get noDriverAssigned;
+
+  /// No description provided for @selectDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an Active Driver'**
+  String get selectDriver;
+
+  /// No description provided for @noAvailableDrivers.
+  ///
+  /// In en, this message translates to:
+  /// **'No active unassigned drivers available.'**
+  String get noAvailableDrivers;
+
+  /// No description provided for @noDriversFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No drivers found'**
+  String get noDriversFound;
+
+  /// No description provided for @vehicleDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle Details'**
+  String get vehicleDetailsTitle;
+
+  /// No description provided for @tabOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get tabOverview;
+
+  /// No description provided for @tabDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents'**
+  String get tabDocuments;
+
+  /// No description provided for @tabMaintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance'**
+  String get tabMaintenance;
+
+  /// No description provided for @vehicleSpecifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle Specifications'**
+  String get vehicleSpecifications;
+
+  /// No description provided for @assignedDriverCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Assigned Driver'**
+  String get assignedDriverCard;
+
+  /// No description provided for @uploadDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Document'**
+  String get uploadDocument;
+
+  /// No description provided for @documentHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Document History'**
+  String get documentHistory;
+
+  /// No description provided for @documentType.
+  ///
+  /// In en, this message translates to:
+  /// **'Document Type'**
+  String get documentType;
+
+  /// No description provided for @expiryDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiry Date'**
+  String get expiryDate;
+
+  /// No description provided for @isoDateFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'YYYY-MM-DD'**
+  String get isoDateFormat;
+
+  /// No description provided for @expiryState.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiry State'**
+  String get expiryState;
+
+  /// No description provided for @docRegistration.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration'**
+  String get docRegistration;
+
+  /// No description provided for @docTaxToken.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax Token'**
+  String get docTaxToken;
+
+  /// No description provided for @docInsurance.
+  ///
+  /// In en, this message translates to:
+  /// **'Insurance'**
+  String get docInsurance;
+
+  /// No description provided for @docFitness.
+  ///
+  /// In en, this message translates to:
+  /// **'Fitness Certificate'**
+  String get docFitness;
+
+  /// No description provided for @docOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get docOther;
+
+  /// No description provided for @statusValid.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid'**
+  String get statusValid;
+
+  /// No description provided for @statusExpiringSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiring Soon'**
+  String get statusExpiringSoon;
+
+  /// No description provided for @statusExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get statusExpired;
+
+  /// No description provided for @statusNoExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'No Expiry Date'**
+  String get statusNoExpiry;
+
+  /// No description provided for @download.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get download;
+
+  /// No description provided for @selectFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Select File'**
+  String get selectFile;
+
+  /// No description provided for @fileSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected: {name}'**
+  String fileSelected(Object name);
+
+  /// No description provided for @uploadSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Document uploaded successfully'**
+  String get uploadSuccess;
+
+  /// No description provided for @acceptedDocumentTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a PDF, JPG, or PNG (up to 10 MB)'**
+  String get acceptedDocumentTypes;
+
+  /// No description provided for @unsupportedDocumentType.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a PDF, JPG, or PNG file'**
+  String get unsupportedDocumentType;
+
+  /// No description provided for @cannotReadSelectedFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not read the selected file. Please choose it again.'**
+  String get cannotReadSelectedFile;
+
+  /// No description provided for @documentFileTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'The file must be 10 MB or smaller'**
+  String get documentFileTooLarge;
+
+  /// No description provided for @selectDocumentFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a document before uploading'**
+  String get selectDocumentFirst;
+
+  /// No description provided for @downloadLinkFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not create a document download link'**
+  String get downloadLinkFailed;
+
+  /// No description provided for @noDocumentsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No documents uploaded yet.'**
+  String get noDocumentsYet;
+
+  /// No description provided for @addMaintenanceRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Maintenance Record'**
+  String get addMaintenanceRecord;
+
+  /// No description provided for @maintenanceHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance History'**
+  String get maintenanceHistory;
+
+  /// No description provided for @maintenanceType.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance Type'**
+  String get maintenanceType;
+
+  /// No description provided for @cost.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost (BDT)'**
+  String get cost;
+
+  /// No description provided for @costHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 4500.00'**
+  String get costHint;
+
+  /// No description provided for @costRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost is required'**
+  String get costRequired;
+
+  /// No description provided for @costInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid non-negative amount'**
+  String get costInvalid;
+
+  /// No description provided for @workshop.
+  ///
+  /// In en, this message translates to:
+  /// **'Workshop / Vendor'**
+  String get workshop;
+
+  /// No description provided for @workshopHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Navana Toyota Service Center'**
+  String get workshopHint;
+
+  /// No description provided for @notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes / Remarks'**
+  String get notes;
+
+  /// No description provided for @maintenanceNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe the work performed'**
+  String get maintenanceNotesHint;
+
+  /// No description provided for @maintenanceDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance Date'**
+  String get maintenanceDate;
+
+  /// No description provided for @maintenanceScheduledService.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled Service'**
+  String get maintenanceScheduledService;
+
+  /// No description provided for @maintenanceOilChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Oil Change'**
+  String get maintenanceOilChange;
+
+  /// No description provided for @maintenanceTireReplacement.
+  ///
+  /// In en, this message translates to:
+  /// **'Tire Replacement'**
+  String get maintenanceTireReplacement;
+
+  /// No description provided for @maintenanceBrakeRepair.
+  ///
+  /// In en, this message translates to:
+  /// **'Brake Inspection / Repair'**
+  String get maintenanceBrakeRepair;
+
+  /// No description provided for @maintenanceEngineDiagnostics.
+  ///
+  /// In en, this message translates to:
+  /// **'Engine Diagnostics'**
+  String get maintenanceEngineDiagnostics;
+
+  /// No description provided for @maintenanceBatteryReplacement.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery Replacement'**
+  String get maintenanceBatteryReplacement;
+
+  /// No description provided for @maintenanceSuspensionAlignment.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspension & Alignment'**
+  String get maintenanceSuspensionAlignment;
+
+  /// No description provided for @maintenanceBodyPaint.
+  ///
+  /// In en, this message translates to:
+  /// **'Body & Paint'**
+  String get maintenanceBodyPaint;
+
+  /// No description provided for @maintenanceEmergencyRepair.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency Repair'**
+  String get maintenanceEmergencyRepair;
+
+  /// No description provided for @maintenanceOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get maintenanceOther;
+
+  /// No description provided for @maintenanceAddedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance record added successfully'**
+  String get maintenanceAddedSuccess;
+
+  /// No description provided for @addMaintenanceFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not add the maintenance record'**
+  String get addMaintenanceFailed;
+
+  /// No description provided for @workshopRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Workshop name is required'**
+  String get workshopRequired;
+
+  /// No description provided for @noMaintenanceYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No maintenance records recorded yet.'**
+  String get noMaintenanceYet;
+
+  /// No description provided for @maintenanceThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance This Month'**
+  String get maintenanceThisMonth;
+
+  /// No description provided for @maintenanceRecordsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'records'**
+  String get maintenanceRecordsCount;
+
+  /// No description provided for @allTimeMaintenanceSpend.
+  ///
+  /// In en, this message translates to:
+  /// **'All-Time Maintenance Spend'**
+  String get allTimeMaintenanceSpend;
+
+  /// No description provided for @recentMaintenanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Maintenance'**
+  String get recentMaintenanceTitle;
+
+  /// No description provided for @noRecentMaintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'No recent maintenance records'**
+  String get noRecentMaintenance;
+
+  /// No description provided for @expiringSoonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents Expiring Soon'**
+  String get expiringSoonTitle;
+
+  /// No description provided for @noExpiringSoonDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'No documents expiring soon'**
+  String get noExpiringSoonDocuments;
+
+  /// No description provided for @documentExpiryAlertTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Document Attention Required'**
+  String get documentExpiryAlertTitle;
+
+  /// No description provided for @documentExpiryAlertExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} document(s) have expired'**
+  String documentExpiryAlertExpired(int count);
+
+  /// No description provided for @documentExpiryAlertExpiring.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} document(s) expiring soon'**
+  String documentExpiryAlertExpiring(int count);
+
+  /// No description provided for @expiringDocumentsAttention.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents Expiring Soon'**
+  String get expiringDocumentsAttention;
+
+  /// No description provided for @expiredDocumentsAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired Documents'**
+  String get expiredDocumentsAlert;
+
+  /// No description provided for @attentionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Attention Required'**
+  String get attentionRequired;
+
+  /// No description provided for @allDocumentsHealthy.
+  ///
+  /// In en, this message translates to:
+  /// **'All vehicle documents are currently up-to-date.'**
+  String get allDocumentsHealthy;
 }
 
 class _AppLocalizationsDelegate

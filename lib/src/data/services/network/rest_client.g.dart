@@ -4,10 +4,6 @@ part of 'rest_client.dart';
 
 // dart format off
 
-// **************************************************************************
-// RetrofitGenerator
-// **************************************************************************
-
 // ignore_for_file: type=lint
 // ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter,avoid_unused_constructor_parameters,unreachable_from_main,avoid_redundant_argument_values
 
@@ -72,6 +68,8 @@ class _RestClient implements RestClient {
     String? status,
     int? page,
     int? size,
+    String? sortBy,
+    String? sortDirection,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -86,6 +84,12 @@ class _RestClient implements RestClient {
     }
     if (size != null) {
       queryParameters['size'] = size;
+    }
+    if (sortBy != null && sortBy.isNotEmpty) {
+      queryParameters['sortBy'] = sortBy;
+    }
+    if (sortDirection != null && sortDirection.isNotEmpty) {
+      queryParameters['sortDirection'] = sortDirection;
     }
 
     final _headers = <String, dynamic>{};
@@ -132,19 +136,17 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<HttpResponse<dynamic>> getVehicleByNumber(
-    String vehicleNumber,
-  ) async {
+  Future<HttpResponse<dynamic>> getVehicleByNumber(String vehicleNumber) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final encodedNumber = Uri.encodeComponent(vehicleNumber);
+    final encoded = Uri.encodeComponent(vehicleNumber);
     final _options = _setStreamType<HttpResponse<dynamic>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/vehicles/${encodedNumber}',
+            '/vehicles/${encoded}',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -166,12 +168,12 @@ class _RestClient implements RestClient {
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(request);
-    final encodedNumber = Uri.encodeComponent(vehicleNumber);
+    final encoded = Uri.encodeComponent(vehicleNumber);
     final _options = _setStreamType<HttpResponse<dynamic>>(
       Options(method: 'PUT', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/vehicles/${encodedNumber}',
+            '/vehicles/${encoded}',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -184,19 +186,375 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<HttpResponse<dynamic>> deleteVehicle(
+  Future<HttpResponse<dynamic>> deleteVehicle(String vehicleNumber) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final encoded = Uri.encodeComponent(vehicleNumber);
+    final _options = _setStreamType<HttpResponse<dynamic>>(
+      Options(method: 'DELETE', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/vehicles/${encoded}',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> assignDriver(
     String vehicleNumber,
+    Map<String, dynamic> request,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(request);
+    final encoded = Uri.encodeComponent(vehicleNumber);
+    final _options = _setStreamType<HttpResponse<dynamic>>(
+      Options(method: 'PUT', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/vehicles/${encoded}/driver',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> unassignDriver(String vehicleNumber) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final encoded = Uri.encodeComponent(vehicleNumber);
+    final _options = _setStreamType<HttpResponse<dynamic>>(
+      Options(method: 'DELETE', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/vehicles/${encoded}/driver',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> getDrivers({
+    String? search,
+    String? status,
+    int? page,
+    int? size,
+    String? sortBy,
+    String? sortDirection,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    if (search != null && search.isNotEmpty) {
+      queryParameters['search'] = search;
+    }
+    if (status != null && status.isNotEmpty && status != 'All') {
+      queryParameters['status'] = status;
+    }
+    if (page != null) {
+      queryParameters['page'] = page;
+    }
+    if (size != null) {
+      queryParameters['size'] = size;
+    }
+    if (sortBy != null && sortBy.isNotEmpty) {
+      queryParameters['sortBy'] = sortBy;
+    }
+    if (sortDirection != null && sortDirection.isNotEmpty) {
+      queryParameters['sortDirection'] = sortDirection;
+    }
+
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<HttpResponse<dynamic>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/drivers',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> createDriver(
+    Map<String, dynamic> request,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(request);
+    final _options = _setStreamType<HttpResponse<dynamic>>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/drivers',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> getDriverById(int driverId) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<HttpResponse<dynamic>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/drivers/${driverId}',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> updateDriver(
+    int driverId,
+    Map<String, dynamic> request,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(request);
+    final _options = _setStreamType<HttpResponse<dynamic>>(
+      Options(method: 'PUT', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/drivers/${driverId}',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> deleteDriver(int driverId) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<HttpResponse<dynamic>>(
+      Options(method: 'DELETE', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/drivers/${driverId}',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> uploadDocument(
+    String vehicleNumber,
+    MultipartFile file,
+    String documentType,
+    String? expiryDate,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = FormData();
+    _data.files.add(MapEntry('file', file));
+    _data.fields.add(MapEntry('documentType', documentType));
+    if (expiryDate != null && expiryDate.isNotEmpty) {
+      _data.fields.add(MapEntry('expiryDate', expiryDate));
+    }
+    final encoded = Uri.encodeComponent(vehicleNumber);
+    final _options = _setStreamType<HttpResponse<dynamic>>(
+      Options(
+        method: 'POST',
+        headers: _headers,
+        extra: _extra,
+        contentType: 'multipart/form-data',
+      )
+          .compose(
+            _dio.options,
+            '/vehicles/${encoded}/documents',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> getDocuments(
+    String vehicleNumber, {
+    String? documentType,
+    String? expiryState,
+    int? page,
+    int? size,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    if (documentType != null && documentType.isNotEmpty) {
+      queryParameters['documentType'] = documentType;
+    }
+    if (expiryState != null && expiryState.isNotEmpty) {
+      queryParameters['expiryState'] = expiryState;
+    }
+    if (page != null) {
+      queryParameters['page'] = page;
+    }
+    if (size != null) {
+      queryParameters['size'] = size;
+    }
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final encoded = Uri.encodeComponent(vehicleNumber);
+    final _options = _setStreamType<HttpResponse<dynamic>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/vehicles/${encoded}/documents',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> getDocumentDownloadUrl(
+    String vehicleNumber,
+    int documentId,
   ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final encodedNumber = Uri.encodeComponent(vehicleNumber);
+    final encoded = Uri.encodeComponent(vehicleNumber);
     final _options = _setStreamType<HttpResponse<dynamic>>(
-      Options(method: 'DELETE', headers: _headers, extra: _extra)
+      Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/vehicles/${encodedNumber}',
+            '/vehicles/${encoded}/documents/${documentId}/download',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> createMaintenanceRecord(
+    String vehicleNumber,
+    Map<String, dynamic> request,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(request);
+    final encoded = Uri.encodeComponent(vehicleNumber);
+    final _options = _setStreamType<HttpResponse<dynamic>>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/vehicles/${encoded}/maintenance',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> getMaintenanceRecords(
+    String vehicleNumber, {
+    int? page,
+    int? size,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    if (page != null) {
+      queryParameters['page'] = page;
+    }
+    if (size != null) {
+      queryParameters['size'] = size;
+    }
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final encoded = Uri.encodeComponent(vehicleNumber);
+    final _options = _setStreamType<HttpResponse<dynamic>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/vehicles/${encoded}/maintenance',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -257,5 +615,3 @@ class _RestClient implements RestClient {
     return Uri.parse(dioBaseUrl).resolveUri(url).toString();
   }
 }
-
-// dart format on

@@ -4,17 +4,29 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../data/repositories/vehicles_repository_impl.dart';
 import '../../../../domain/entities/dashboard_stats.dart';
+import '../../../../domain/entities/paged_response.dart';
 import '../../../../domain/entities/vehicle.dart';
 import '../../../../domain/repositories/vehicles_repository.dart';
 
 export '../../../../domain/entities/dashboard_stats.dart';
+export '../../../../domain/entities/vehicle.dart';
+
+class VehiclesLoadingNotifier extends Notifier<bool> {
+  @override
+  bool build() => true;
+
+  void setLoading(bool loading) => state = loading;
+}
+
+final vehiclesLoadingProvider = NotifierProvider<VehiclesLoadingNotifier, bool>(
+  VehiclesLoadingNotifier.new,
+);
 
 /// Single source of truth for fleet vehicle records backed by the REST API.
-///
-/// Modifying this state (create, edit, delete) automatically and reactively
-/// updates both the Vehicles List screen and the Dashboard summary KPI cards.
 class VehiclesNotifier extends Notifier<List<Vehicle>> {
-  late final VehiclesRepository _repository;
+  late VehiclesRepository _repository;
+
+  String? get lastError => _repository.lastError;
 
   @override
   List<Vehicle> build() {
@@ -25,8 +37,16 @@ class VehiclesNotifier extends Notifier<List<Vehicle>> {
 
   /// Fetch vehicles from the backend API.
   Future<void> fetchVehicles() async {
-    final vehicles = await _repository.getVehicles();
-    state = vehicles;
+    ref.read(vehiclesLoadingProvider.notifier).setLoading(true);
+    try {
+      final vehicles = await _repository.getVehicles(
+        sortBy: 'updatedAt',
+        sortDirection: 'desc',
+      );
+      state = vehicles;
+    } finally {
+      ref.read(vehiclesLoadingProvider.notifier).setLoading(false);
+    }
   }
 
   /// Check whether a vehicle number already exists (case-insensitive).
@@ -45,7 +65,7 @@ class VehiclesNotifier extends Notifier<List<Vehicle>> {
     });
   }
 
-  /// Retrieve a vehicle by number for pre-filling the edit form.
+  /// Retrieve a vehicle by number for pre-filling the edit form or details.
   Vehicle? getVehicle(String vehicleNumber) {
     final normalized = vehicleNumber.trim().toUpperCase();
     try {
@@ -74,6 +94,8 @@ class VehiclesNotifier extends Notifier<List<Vehicle>> {
     }
 
     state = [created, ...state];
+    ref.invalidate(vehiclesPageProvider);
+    ref.read(dashboardStatsProvider.notifier).refresh();
     return null;
   }
 
@@ -104,6 +126,8 @@ class VehiclesNotifier extends Notifier<List<Vehicle>> {
         else
           v,
     ];
+    ref.invalidate(vehiclesPageProvider);
+    ref.read(dashboardStatsProvider.notifier).refresh();
     return null;
   }
 
@@ -116,6 +140,42 @@ class VehiclesNotifier extends Notifier<List<Vehicle>> {
       state = state
           .where((v) => v.vehicleNumber.trim().toUpperCase() != normalized)
           .toList();
+      ref.invalidate(vehiclesPageProvider);
+      ref.read(dashboardStatsProvider.notifier).refresh();
+      return true;
+    }
+    return false;
+  }
+
+  /// Assign driver to vehicle and update state
+  Future<bool> assignDriver(String vehicleNumber, int driverId) async {
+    final updated = await _repository.assignDriver(vehicleNumber, driverId);
+    if (updated != null) {
+      final normalized = vehicleNumber.trim().toUpperCase();
+      state = [
+        for (final v in state)
+          if (v.vehicleNumber.trim().toUpperCase() == normalized)
+            updated
+          else
+            v,
+      ];
+      return true;
+    }
+    return false;
+  }
+
+  /// Unassign driver from vehicle and update state
+  Future<bool> unassignDriver(String vehicleNumber) async {
+    final success = await _repository.unassignDriver(vehicleNumber);
+    if (success) {
+      final normalized = vehicleNumber.trim().toUpperCase();
+      state = [
+        for (final v in state)
+          if (v.vehicleNumber.trim().toUpperCase() == normalized)
+            v.copyWith(assignedDriver: () => null)
+          else
+            v,
+      ];
       return true;
     }
     return false;
@@ -136,16 +196,35 @@ class VehicleFilterState {
 
   final String searchQuery;
   final String statusFilter;
+  final int page;
+  final int size;
+  final String sortBy;
+  final String sortDirection;
 
   const VehicleFilterState({
     this.searchQuery = '',
     this.statusFilter = allStatuses,
+    this.page = 0,
+    this.size = 10,
+    this.sortBy = 'updatedAt',
+    this.sortDirection = 'desc',
   });
 
-  VehicleFilterState copyWith({String? searchQuery, String? statusFilter}) {
+  VehicleFilterState copyWith({
+    String? searchQuery,
+    String? statusFilter,
+    int? page,
+    int? size,
+    String? sortBy,
+    String? sortDirection,
+  }) {
     return VehicleFilterState(
       searchQuery: searchQuery ?? this.searchQuery,
       statusFilter: statusFilter ?? this.statusFilter,
+      page: page ?? this.page,
+      size: size ?? this.size,
+      sortBy: sortBy ?? this.sortBy,
+      sortDirection: sortDirection ?? this.sortDirection,
     );
   }
 }
@@ -155,11 +234,23 @@ class VehicleFilterNotifier extends Notifier<VehicleFilterState> {
   VehicleFilterState build() => const VehicleFilterState();
 
   void setSearch(String query) {
-    state = state.copyWith(searchQuery: query.trim());
+    state = state.copyWith(searchQuery: query.trim(), page: 0);
   }
 
   void setStatus(String status) {
-    state = state.copyWith(statusFilter: status);
+    state = state.copyWith(statusFilter: status, page: 0);
+  }
+
+  void setPage(int page) {
+    state = state.copyWith(page: page);
+  }
+
+  void setSort(String sortBy, String sortDirection) {
+    state = state.copyWith(
+      sortBy: sortBy,
+      sortDirection: sortDirection,
+      page: 0,
+    );
   }
 
   void reset() {
@@ -172,74 +263,129 @@ final vehicleFilterProvider =
       VehicleFilterNotifier.new,
     );
 
-/// Filtered list of fleet vehicles reacting to search text and status dropdown.
-final filteredVehiclesProvider = Provider<List<Vehicle>>((ref) {
-  final vehicles = ref.watch(vehiclesProvider);
-  final filter = ref.watch(vehicleFilterProvider);
+@immutable
+class VehiclesPageState {
+  final PagedResponse<Vehicle> result;
+  final bool isLoading;
+  final String? errorMessage;
 
-  return vehicles.where((v) {
-    final matchesStatus =
-        filter.statusFilter == VehicleFilterState.allStatuses ||
-        v.status == filter.statusFilter;
+  const VehiclesPageState({
+    this.result = const PagedResponse.empty(),
+    this.isLoading = false,
+    this.errorMessage,
+  });
 
-    if (!matchesStatus) return false;
+  VehiclesPageState copyWith({
+    PagedResponse<Vehicle>? result,
+    bool? isLoading,
+    String? errorMessage,
+  }) => VehiclesPageState(
+    result: result ?? this.result,
+    isLoading: isLoading ?? this.isLoading,
+    errorMessage: errorMessage,
+  );
+}
 
-    if (filter.searchQuery.isEmpty) return true;
+class VehiclesPageNotifier extends Notifier<VehiclesPageState> {
+  late VehiclesRepository _repository;
+  int _requestId = 0;
 
-    final query = filter.searchQuery.toLowerCase();
-    final matchesQuery =
-        v.vehicleNumber.toLowerCase().contains(query) ||
-        v.company.toLowerCase().contains(query) ||
-        v.brand.toLowerCase().contains(query) ||
-        v.model.toLowerCase().contains(query) ||
-        v.type.toLowerCase().contains(query);
+  @override
+  VehiclesPageState build() {
+    _repository = ref.watch(vehiclesRepositoryProvider);
+    final filter = ref.watch(vehicleFilterProvider);
+    Future.microtask(() => fetchPage(filter));
+    return const VehiclesPageState(isLoading: true);
+  }
 
-    return matchesQuery;
-  }).toList();
-});
+  Future<void> fetchPage([VehicleFilterState? requestedFilter]) async {
+    final requestId = ++_requestId;
+    final filter = requestedFilter ?? ref.read(vehicleFilterProvider)!;
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    final result = await _repository.getVehiclesPaged(
+      search: filter.searchQuery.isNotEmpty ? filter.searchQuery : null,
+      status: filter.statusFilter != VehicleFilterState.allStatuses
+          ? filter.statusFilter
+          : null,
+      page: filter.page,
+      size: filter.size,
+      sortBy: filter.sortBy,
+      sortDirection: filter.sortDirection,
+    );
+    if (requestId != _requestId) return;
+    state = state.copyWith(
+      result: result,
+      isLoading: false,
+      errorMessage: result.isEmpty ? _repository.lastError : null,
+    );
+  }
+}
+
+final vehiclesPageProvider =
+    NotifierProvider<VehiclesPageNotifier, VehiclesPageState>(
+      VehiclesPageNotifier.new,
+    );
 
 // =============================================================================
-// Dashboard Derived Metrics
+// Dashboard Derived Metrics & Sync
 // =============================================================================
+
+class DashboardLoadingNotifier extends Notifier<bool> {
+  @override
+  bool build() => true;
+
+  void setLoading(bool loading) => state = loading;
+}
+
+final dashboardLoadingProvider =
+    NotifierProvider<DashboardLoadingNotifier, bool>(
+      DashboardLoadingNotifier.new,
+    );
+
+class DashboardStatsErrorNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void setError(bool hasError) => state = hasError;
+}
+
+final dashboardStatsErrorProvider =
+    NotifierProvider<DashboardStatsErrorNotifier, bool>(
+      DashboardStatsErrorNotifier.new,
+    );
 
 class DashboardStatsNotifier extends Notifier<DashboardStats> {
   @override
   DashboardStats build() {
-    final vehicles = ref.watch(vehiclesProvider);
-    int activeCount = 0;
-    int inServiceCount = 0;
-    int inactiveCount = 0;
-
-    for (final v in vehicles) {
-      switch (v.status) {
-        case Vehicle.statusActive:
-          activeCount++;
-          break;
-        case Vehicle.statusInService:
-          inServiceCount++;
-          break;
-        case Vehicle.statusInactive:
-          inactiveCount++;
-          break;
-      }
-    }
-
-    return DashboardStats(
-      total: vehicles.length,
-      active: activeCount,
-      inService: inServiceCount,
-      inactive: inactiveCount,
-    );
+    Future.microtask(() {
+      if (ref.mounted) refresh();
+    });
+    return const DashboardStats.empty();
   }
 
   Future<void> refresh() async {
+    if (!ref.mounted) return;
+    ref.read(dashboardLoadingProvider.notifier).setLoading(true);
+    ref.read(dashboardStatsErrorProvider.notifier).setError(false);
     try {
       final repo = ref.read(vehiclesRepositoryProvider);
       final stats = await repo.getDashboardStats();
-      if (stats.total > 0) {
+      if (!ref.mounted) return;
+      if (repo.lastError == null) {
         state = stats;
+        ref.read(dashboardStatsErrorProvider.notifier).setError(false);
+      } else {
+        ref.read(dashboardStatsErrorProvider.notifier).setError(true);
       }
-    } catch (_) {}
+    } catch (_) {
+      if (ref.mounted) {
+        ref.read(dashboardStatsErrorProvider.notifier).setError(true);
+      }
+    } finally {
+      if (ref.mounted) {
+        ref.read(dashboardLoadingProvider.notifier).setLoading(false);
+      }
+    }
   }
 }
 
@@ -248,7 +394,7 @@ final dashboardStatsProvider =
       DashboardStatsNotifier.new,
     );
 
-/// First 4 recent vehicles for the dashboard preview.
+/// First four recently updated vehicles for the dashboard preview.
 final recentlyAddedVehiclesProvider = Provider<List<Vehicle>>((ref) {
   final vehicles = ref.watch(vehiclesProvider);
   return vehicles.take(4).toList();

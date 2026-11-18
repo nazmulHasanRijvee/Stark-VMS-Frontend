@@ -8,8 +8,10 @@ import '../../feature/auth/login_screen/view/login_screen.dart';
 import '../../feature/auth/signup_screen/view/signup_screen.dart';
 import '../../feature/auth/view_model/auth_provider.dart';
 import '../../feature/dashboard/view/dashboard_screen.dart';
+import '../../feature/drivers/view/drivers_screen.dart';
 import '../../feature/onboarding/view/start_today_screen.dart';
 import '../../feature/splash/splash_screen/view/splash_screen.dart';
+import '../../feature/vehicles/view/vehicle_details_screen.dart';
 import '../../feature/vehicles/view/vehicle_form_screen.dart';
 import '../../feature/vehicles/view/vehicles_screen.dart';
 import '../shell/vms_app_shell.dart';
@@ -103,7 +105,35 @@ final routerProvider = Provider<GoRouter>((ref) {
                       );
                     },
                   ),
+                  GoRoute(
+                    path: 'details/:vehicleNumber',
+                    name: Routes.vehicleDetails.name,
+                    pageBuilder: (context, state) {
+                      final rawNumber =
+                          state.pathParameters['vehicleNumber'] ?? '';
+                      final vehicleNumber = Uri.decodeComponent(rawNumber);
+                      return buildTransitionPage(
+                        child: VehicleDetailsScreen(
+                          vehicleNumber: vehicleNumber,
+                        ),
+                        key: ValueKey('details_vehicle_$vehicleNumber'),
+                        type: AppTransitionType.fade,
+                      );
+                    },
+                  ),
                 ],
+              ),
+            ],
+          ),
+
+          // Branch 2: Drivers
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.drivers.path,
+                name: Routes.drivers.name,
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage(child: DriversScreen()),
               ),
             ],
           ),

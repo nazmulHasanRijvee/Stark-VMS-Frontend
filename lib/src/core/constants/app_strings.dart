@@ -52,7 +52,6 @@ abstract final class AppStrings {
   static const String dashboardTitle = 'Dashboard';
   static const String totalVehicles = 'Total Vehicles';
   static const String active = 'Active';
-  static const String inService = 'In Service';
   static const String inactive = 'Inactive';
   static const String recentlyAddedVehicles = 'Recently Added Vehicles';
   static const String noVehiclesRegisteredYet = 'No vehicles registered yet';

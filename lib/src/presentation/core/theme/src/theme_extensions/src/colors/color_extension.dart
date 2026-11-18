@@ -81,8 +81,8 @@ abstract interface class ColorExtension {
   // Convenient aliases for vehicle status badges
   Color get statusActiveBg => successBg;
   Color get statusActiveFg => successFg;
-  Color get statusInServiceBg => warningBg;
-  Color get statusInServiceFg => warningFg;
+  Color get statusMaintenanceBg => warningBg;
+  Color get statusMaintenanceFg => warningFg;
   Color get statusInactiveBg => errorBg;
   Color get statusInactiveFg => errorFg;
 }
@@ -229,9 +229,9 @@ class LightColorExtension extends ThemeExtension<LightColorExtension>
   @override
   Color get statusActiveFg => successFg;
   @override
-  Color get statusInServiceBg => warningBg;
+  Color get statusMaintenanceBg => warningBg;
   @override
-  Color get statusInServiceFg => warningFg;
+  Color get statusMaintenanceFg => warningFg;
   @override
   Color get statusInactiveBg => errorBg;
   @override
@@ -520,9 +520,9 @@ class DarkColorExtension extends ThemeExtension<DarkColorExtension>
   @override
   Color get statusActiveFg => successFg;
   @override
-  Color get statusInServiceBg => warningBg;
+  Color get statusMaintenanceBg => warningBg;
   @override
-  Color get statusInServiceFg => warningFg;
+  Color get statusMaintenanceFg => warningFg;
   @override
   Color get statusInactiveBg => errorBg;
   @override

@@ -7,7 +7,7 @@ import '../theme/theme.dart';
 /// Reusable status badge chip matching the Stitch VMS design.
 ///
 /// Features distinct, localized text labels alongside theme-aware background
-/// and foreground colors for Active, In Service, and Inactive states in both
+/// and foreground colors for Active, Maintenance, and Inactive states in both
 /// light and dark modes.
 class StatusChip extends StatelessWidget {
   final String status;
@@ -24,9 +24,9 @@ class StatusChip extends StatelessWidget {
         bg = context.color.statusActiveBg;
         fg = context.color.statusActiveFg;
         break;
-      case Vehicle.statusInService:
-        bg = context.color.statusInServiceBg;
-        fg = context.color.statusInServiceFg;
+      case Vehicle.statusMaintenance:
+        bg = context.color.statusMaintenanceBg;
+        fg = context.color.statusMaintenanceFg;
         break;
       case Vehicle.statusInactive:
       default:
