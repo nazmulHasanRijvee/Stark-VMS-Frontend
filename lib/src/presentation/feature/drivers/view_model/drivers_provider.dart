@@ -228,3 +228,8 @@ class DriversNotifier extends Notifier<DriversListState> {
 final driversProvider = NotifierProvider<DriversNotifier, DriversListState>(
   DriversNotifier.new,
 );
+
+final driverDetailsProvider = FutureProvider.family<Driver?, int>((ref, id) {
+  final repository = ref.watch(driversRepositoryProvider);
+  return repository.getDriver(id);
+});

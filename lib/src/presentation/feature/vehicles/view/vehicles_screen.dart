@@ -653,7 +653,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                 3: FlexColumnWidth(1.0), // Brand
                 4: FlexColumnWidth(1.0), // Model
                 5: FlexColumnWidth(1.1), // Status
-                6: FlexColumnWidth(1.6), // Actions
+                6: FlexColumnWidth(1.9), // Actions
               },
               children: [
                 TableRow(
@@ -858,9 +858,10 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                           horizontal: context.spacing.md,
                           vertical: context.spacing.sm3,
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          mainAxisSize: MainAxisSize.min,
+                        child: Wrap(
+                          alignment: WrapAlignment.end,
+                          spacing: context.spacing.xs,
+                          runSpacing: context.spacing.xs,
                           children: [
                             InkWell(
                               onTap: () => _openVehicleDetails(v),
@@ -899,7 +900,6 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                                 ),
                               ),
                             ),
-                            SizedBox(width: context.spacing.xs),
                             InkWell(
                               onTap: () => _openVehicleEditor(v),
                               borderRadius: BorderRadius.circular(
@@ -937,7 +937,6 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                                 ),
                               ),
                             ),
-                            SizedBox(width: context.spacing.xs),
                             InkWell(
                               onTap: () => _handleDelete(v),
                               borderRadius: BorderRadius.circular(
@@ -967,7 +966,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                                       context.loc.delete,
                                       style: context.textStyle.labelSmall
                                           .copyWith(
-                                            color: context.color.error,
+                                            color: context.color.text.primary,
                                             fontWeight: FontWeight.w600,
                                           ),
                                     ),
@@ -1110,8 +1109,10 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                 ],
               ),
               SizedBox(height: context.spacing.md2),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              Wrap(
+                alignment: WrapAlignment.end,
+                spacing: context.spacing.sm,
+                runSpacing: context.spacing.sm,
                 children: [
                   OutlinedButton.icon(
                     onPressed: () => _openVehicleDetails(v),
@@ -1133,7 +1134,6 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(width: context.spacing.sm),
                   OutlinedButton.icon(
                     onPressed: () => _openVehicleEditor(v),
                     icon: Icon(Icons.edit_outlined, size: context.sizes.iconXs),
@@ -1151,7 +1151,6 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(width: context.spacing.sm),
                   ElevatedButton.icon(
                     onPressed: () => _handleDelete(v),
                     icon: Icon(

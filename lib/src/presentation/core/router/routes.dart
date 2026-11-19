@@ -17,7 +17,9 @@ enum Routes {
   vehicleRegister('/vehicles/register'),
   vehicleEdit('/vehicles/edit/:vehicleNumber'),
   vehicleDetails('/vehicles/details/:vehicleNumber'),
-  drivers('/drivers');
+  drivers('/drivers'),
+  driverRegister('/drivers/register'),
+  driverEdit('/drivers/edit/:driverId');
 
   const Routes(this.path);
 

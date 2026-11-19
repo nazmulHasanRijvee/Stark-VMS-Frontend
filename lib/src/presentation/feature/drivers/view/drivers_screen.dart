@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../core/extensions/localization_extension.dart';
+import '../../../core/router/routes.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/custom_toast.dart';
 import '../../../core/widgets/custom_loading_indicator.dart';
@@ -53,12 +55,21 @@ class _DriversScreenState extends ConsumerState<DriversScreen> {
     ref.read(driversFilterProvider.notifier).reset();
   }
 
-  void _openDriverForm([Driver? driver]) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => _DriverFormDialog(driver: driver),
+  void _navigateTo(String path) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.go(path);
+    });
+  }
+
+  void _openDriverForm() => _navigateTo(Routes.driverRegister.path);
+
+  void _openDriverEdit(Driver driver) {
+    final path = Routes.driverEdit.path.replaceFirst(
+      ':driverId',
+      driver.id.toString(),
     );
+    _navigateTo(path);
   }
 
   String _formatDate(BuildContext context, String value) {
@@ -170,7 +181,7 @@ class _DriversScreenState extends ConsumerState<DriversScreen> {
                     ),
                     SizedBox(width: context.spacing.lg),
                     ElevatedButton.icon(
-                      onPressed: () => _openDriverForm(),
+                      onPressed: _openDriverForm,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: context.color.primary,
                         foregroundColor: context.color.onPrimary,
@@ -585,7 +596,7 @@ class _DriversScreenState extends ConsumerState<DriversScreen> {
                         color: context.color.primary,
                       ),
                       tooltip: context.loc.edit,
-                      onPressed: () => _openDriverForm(driver),
+                      onPressed: () => _openDriverEdit(driver),
                     ),
                     IconButton(
                       icon: Icon(
@@ -673,7 +684,7 @@ class _DriversScreenState extends ConsumerState<DriversScreen> {
                           size: context.sizes.iconSm,
                           color: context.color.primary,
                         ),
-                        onPressed: () => _openDriverForm(driver),
+                        onPressed: () => _openDriverEdit(driver),
                       ),
                       IconButton(
                         icon: Icon(
@@ -799,283 +810,6 @@ class _DriversScreenState extends ConsumerState<DriversScreen> {
           fontWeight: FontWeight.w700,
           color: context.color.text.secondary,
           letterSpacing: 0.5,
-        ),
-      ),
-    );
-  }
-}
-
-class _DriverFormDialog extends ConsumerStatefulWidget {
-  final Driver? driver;
-
-  const _DriverFormDialog({this.driver});
-
-  @override
-  ConsumerState<_DriverFormDialog> createState() => _DriverFormDialogState();
-}
-
-class _DriverFormDialogState extends ConsumerState<_DriverFormDialog> {
-  final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _nameController;
-  late final TextEditingController _phoneController;
-  late final TextEditingController _licenseNumberController;
-  late final TextEditingController _licenseExpiryController;
-  late String _status;
-  bool _isSaving = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(text: widget.driver?.name ?? '');
-    _phoneController = TextEditingController(text: widget.driver?.phone ?? '');
-    _licenseNumberController = TextEditingController(
-      text: widget.driver?.licenseNumber ?? '',
-    );
-    _licenseExpiryController = TextEditingController(
-      text: widget.driver?.licenseExpiry ?? '',
-    );
-    _status = widget.driver?.status ?? Driver.statusActive;
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _phoneController.dispose();
-    _licenseNumberController.dispose();
-    _licenseExpiryController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _pickDate() async {
-    final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: now.add(const Duration(days: 365)),
-      firstDate: now.subtract(const Duration(days: 365 * 5)),
-      lastDate: now.add(const Duration(days: 365 * 20)),
-    );
-    if (picked != null) {
-      final y = picked.year.toString().padLeft(4, '0');
-      final m = picked.month.toString().padLeft(2, '0');
-      final d = picked.day.toString().padLeft(2, '0');
-      _licenseExpiryController.text = '$y-$m-$d';
-    }
-  }
-
-  Future<void> _submit() async {
-    if (!(_formKey.currentState?.validate() ?? false)) return;
-
-    setState(() => _isSaving = true);
-
-    final driver = Driver(
-      id: widget.driver?.id ?? 0,
-      name: _nameController.text.trim(),
-      phone: _phoneController.text.trim(),
-      licenseNumber: _licenseNumberController.text.trim().toUpperCase(),
-      licenseExpiry: _licenseExpiryController.text.trim(),
-      status: _status,
-    );
-
-    bool success;
-    if (widget.driver == null) {
-      success = await ref.read(driversProvider.notifier).createDriver(driver);
-    } else {
-      success = await ref
-          .read(driversProvider.notifier)
-          .updateDriver(widget.driver!.id, driver);
-    }
-
-    if (mounted) {
-      setState(() => _isSaving = false);
-      if (success) {
-        CustomToast.showSuccess(
-          context,
-          title: widget.driver == null
-              ? context.loc.driverCreatedSuccess
-              : context.loc.driverUpdatedSuccess,
-        );
-        Navigator.of(context).pop();
-      } else {
-        final err = ref.read(driversProvider).errorMessage;
-        CustomToast.showError(
-          context,
-          title: err == null
-              ? context.loc.apiRequestFailed
-              : context.loc.localizedApiError(err),
-        );
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isEdit = widget.driver != null;
-
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(context.radius.lg),
-      ),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 520),
-        child: Padding(
-          padding: EdgeInsets.all(context.spacing.xl2),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      isEdit ? context.loc.editDriver : context.loc.addDriver,
-                      style: context.textStyle.headLineSmall.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ],
-                ),
-                SizedBox(height: context.spacing.lg),
-
-                // Driver Name
-                TextFormField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    labelText: context.loc.driverName,
-                    hintText: context.loc.fullNameHint,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(context.radius.sm),
-                    ),
-                  ),
-                  validator: (val) => val == null || val.trim().isEmpty
-                      ? context.loc.driverNameRequired
-                      : null,
-                ),
-                SizedBox(height: context.spacing.md),
-
-                // Phone
-                TextFormField(
-                  controller: _phoneController,
-                  decoration: InputDecoration(
-                    labelText: context.loc.phone,
-                    hintText: context.loc.phoneHint,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(context.radius.sm),
-                    ),
-                  ),
-                  validator: (val) => val == null || val.trim().isEmpty
-                      ? context.loc.phoneRequired
-                      : null,
-                ),
-                SizedBox(height: context.spacing.md),
-
-                // License Number
-                TextFormField(
-                  controller: _licenseNumberController,
-                  decoration: InputDecoration(
-                    labelText: context.loc.licenseNumber,
-                    hintText: context.loc.licenseNumberHint,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(context.radius.sm),
-                    ),
-                  ),
-                  validator: (val) => val == null || val.trim().isEmpty
-                      ? context.loc.licenseNumberRequired
-                      : null,
-                ),
-                SizedBox(height: context.spacing.md),
-
-                // License Expiry Date
-                TextFormField(
-                  controller: _licenseExpiryController,
-                  readOnly: true,
-                  onTap: _pickDate,
-                  decoration: InputDecoration(
-                    labelText: context.loc.licenseExpiry,
-                    hintText: context.loc.isoDateFormat,
-                    suffixIcon: const Icon(Icons.calendar_today),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(context.radius.sm),
-                    ),
-                  ),
-                  validator: (val) => val == null || val.trim().isEmpty
-                      ? context.loc.licenseExpiryRequired
-                      : null,
-                ),
-                SizedBox(height: context.spacing.md),
-
-                // Status Dropdown
-                DropdownButtonFormField<String>(
-                  initialValue: _status,
-                  decoration: InputDecoration(
-                    labelText: context.loc.colStatus,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(context.radius.sm),
-                    ),
-                  ),
-                  items: Driver.allowedStatuses
-                      .where(
-                        (status) =>
-                            !(widget.driver?.isAssigned ?? false) ||
-                            status == Driver.statusActive,
-                      )
-                      .map((s) {
-                        return DropdownMenuItem(
-                          value: s,
-                          child: Text(context.loc.localizedStatus(s)),
-                        );
-                      })
-                      .toList(),
-                  onChanged: widget.driver?.isAssigned ?? false
-                      ? null
-                      : (val) {
-                          if (val != null) setState(() => _status = val);
-                        },
-                ),
-                SizedBox(height: context.spacing.xl),
-
-                // Actions
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text(context.loc.cancel),
-                    ),
-                    SizedBox(width: context.spacing.md),
-                    ElevatedButton(
-                      onPressed: _isSaving ? null : _submit,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: context.color.primary,
-                        foregroundColor: context.color.onPrimary,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.spacing.xl,
-                          vertical: context.spacing.md,
-                        ),
-                      ),
-                      child: _isSaving
-                          ? SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: context.color.onPrimary,
-                              ),
-                            )
-                          : Text(
-                              isEdit ? context.loc.update : context.loc.save,
-                            ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
         ),
       ),
     );

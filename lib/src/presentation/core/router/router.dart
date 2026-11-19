@@ -9,6 +9,7 @@ import '../../feature/auth/signup_screen/view/signup_screen.dart';
 import '../../feature/auth/view_model/auth_provider.dart';
 import '../../feature/dashboard/view/dashboard_screen.dart';
 import '../../feature/drivers/view/drivers_screen.dart';
+import '../../feature/drivers/view/driver_form_screen.dart';
 import '../../feature/onboarding/view/start_today_screen.dart';
 import '../../feature/splash/splash_screen/view/splash_screen.dart';
 import '../../feature/vehicles/view/vehicle_details_screen.dart';
@@ -134,6 +135,38 @@ final routerProvider = Provider<GoRouter>((ref) {
                 name: Routes.drivers.name,
                 pageBuilder: (context, state) =>
                     const NoTransitionPage(child: DriversScreen()),
+                routes: [
+                  GoRoute(
+                    path: 'register',
+                    name: Routes.driverRegister.name,
+                    pageBuilder: (context, state) => buildTransitionPage(
+                      child: const DriverFormScreen(),
+                      key: const ValueKey('register_driver_screen'),
+                      type: AppTransitionType.fade,
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'edit/:driverId',
+                    name: Routes.driverEdit.name,
+                    pageBuilder: (context, state) {
+                      final driverId = int.tryParse(
+                        state.pathParameters['driverId'] ?? '',
+                      );
+                      if (driverId == null) {
+                        return buildTransitionPage(
+                          child: const DriverFormScreen(invalidDriverId: true),
+                          key: const ValueKey('invalid_driver_edit_screen'),
+                          type: AppTransitionType.fade,
+                        );
+                      }
+                      return buildTransitionPage(
+                        child: DriverFormScreen(driverId: driverId),
+                        key: ValueKey('edit_driver_$driverId'),
+                        type: AppTransitionType.fade,
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
