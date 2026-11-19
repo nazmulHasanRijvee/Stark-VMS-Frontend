@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../core/extensions/localization_extension.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/app_skeletonizer.dart';
 import '../../../core/widgets/status_chip.dart';
 import '../../../core/widgets/summary_kpi_card.dart';
 import '../../vehicles/view_model/vehicles_provider.dart';
@@ -101,7 +101,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 if (hasStatsError && !isLoading)
                   _buildDashboardError(context)
                 else
-                  Skeletonizer(
+                  AppSkeletonizer(
                     enabled: isLoading,
                     child: _buildKpiGrid(stats, screenWidth),
                   ),
@@ -141,7 +141,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 SizedBox(height: context.spacing.xl),
 
                 // Recently Added Vehicles Section
-                Skeletonizer(
+                AppSkeletonizer(
                   enabled: isVehiclesLoading,
                   child: Container(
                     decoration: BoxDecoration(

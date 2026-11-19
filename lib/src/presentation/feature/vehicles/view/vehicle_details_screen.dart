@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../core/extensions/localization_extension.dart';
 import '../../../../core/utils/platform_file_helper.dart';
@@ -11,6 +10,7 @@ import '../../../../domain/entities/vehicle_document.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/custom_toast.dart';
+import '../../../core/widgets/app_skeletonizer.dart';
 import '../../../core/widgets/custom_loading_indicator.dart';
 import '../../../core/widgets/status_chip.dart';
 import '../../drivers/view_model/drivers_provider.dart';
@@ -180,7 +180,7 @@ class _VehicleDetailsScreenState extends ConsumerState<VehicleDetailsScreen>
                       ),
                     ],
                   ),
-                  child: Skeletonizer(
+                  child: AppSkeletonizer(
                     enabled: detailsState.isLoading && vehicle == null,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -683,7 +683,7 @@ class _VehicleDetailsScreenState extends ConsumerState<VehicleDetailsScreen>
           ),
           SizedBox(height: context.spacing.lg),
 
-          Skeletonizer(
+          AppSkeletonizer(
             enabled: docsState.isLoading && docs.isNotEmpty,
             child: docs.isEmpty && docsState.isLoading
                 ? const SizedBox(height: 72, child: CustomLoadingIndicator())
@@ -1108,7 +1108,7 @@ class _VehicleDetailsScreenState extends ConsumerState<VehicleDetailsScreen>
               ),
               SizedBox(height: context.spacing.lg),
 
-              Skeletonizer(
+              AppSkeletonizer(
                 enabled: mtnState.isLoading && records.isNotEmpty,
                 child: records.isEmpty && mtnState.isLoading
                     ? const SizedBox(

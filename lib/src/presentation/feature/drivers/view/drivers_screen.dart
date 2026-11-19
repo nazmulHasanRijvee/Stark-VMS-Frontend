@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../core/extensions/localization_extension.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/app_skeletonizer.dart';
 import '../../../core/widgets/custom_toast.dart';
 import '../../../core/widgets/custom_loading_indicator.dart';
 import '../../../core/widgets/status_chip.dart';
@@ -275,7 +275,7 @@ class _DriversScreenState extends ConsumerState<DriversScreen> {
                       ),
                     ],
                   ),
-                  child: Skeletonizer(
+                  child: AppSkeletonizer(
                     enabled: state.isLoading && state.drivers.isNotEmpty,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
